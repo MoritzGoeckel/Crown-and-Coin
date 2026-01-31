@@ -2,14 +2,14 @@ package engine
 
 // Country represents a nation in the game
 type Country struct {
-	ID           string
-	HP           int    // Health points, starts at 10
-	ArmyStrength int    // Military power, starts at 0
-	Gold         int    // Treasury
-	Peasants     int    // Tax base, starts at 1
-	IsRepublic   bool   // false = monarchy, true = merchant republic
-	MonarchID    string // Player controlling the country (if monarchy)
-	DiedOnce     bool   // Tracks if country already used its "revival"
+	ID           string `json:"id"`
+	HP           int    `json:"hp"`             // Health points, starts at 10
+	ArmyStrength int    `json:"army_strength"`  // Military power, starts at 0
+	Gold         int    `json:"gold"`           // Treasury
+	Peasants     int    `json:"peasants"`       // Tax base, starts at 1
+	IsRepublic   bool   `json:"is_republic"`    // false = monarchy, true = merchant republic
+	MonarchID    string `json:"monarch_id"`     // Player controlling the country (if monarchy)
+	DiedOnce     bool   `json:"died_once"`      // Tracks if country already used its "revival"
 }
 
 // NewCountry creates a new country with default starting values

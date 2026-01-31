@@ -1,11 +1,16 @@
 package engine
 
+import (
+	"encoding/json"
+	"fmt"
+)
+
 // GameState represents the complete state of the game at any point
 type GameState struct {
-	Turn      int
-	Phase     PhaseType
-	Countries map[string]*Country
-	Merchants map[string]*Merchant
+	Turn      int                  `json:"turn"`
+	Phase     PhaseType            `json:"phase"`
+	Countries map[string]*Country  `json:"countries"`
+	Merchants map[string]*Merchant `json:"merchants"`
 }
 
 // PhaseType represents the different phases of a game turn
@@ -23,18 +28,46 @@ const (
 func (p PhaseType) String() string {
 	switch p {
 	case PhaseTaxation:
-		return "Taxation"
+		return "taxation"
 	case PhaseNegotiation:
-		return "Negotiation"
+		return "negotiation"
 	case PhaseSpending:
-		return "Spending & Investment"
+		return "spending"
 	case PhaseWar:
-		return "War"
+		return "war"
 	case PhaseAssessment:
-		return "Internal Assessment"
+		return "assessment"
 	default:
-		return "Unknown"
+		return "unknown"
 	}
+}
+
+// MarshalJSON serializes PhaseType as a JSON string
+func (p PhaseType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(p.String())
+}
+
+// UnmarshalJSON deserializes PhaseType from a JSON string
+func (p *PhaseType) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	switch s {
+	case "taxation":
+		*p = PhaseTaxation
+	case "negotiation":
+		*p = PhaseNegotiation
+	case "spending":
+		*p = PhaseSpending
+	case "war":
+		*p = PhaseWar
+	case "assessment":
+		*p = PhaseAssessment
+	default:
+		return fmt.Errorf("unknown phase: %s", s)
+	}
+	return nil
 }
 
 // NewGameState creates a new game state
