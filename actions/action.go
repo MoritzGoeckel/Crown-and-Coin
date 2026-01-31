@@ -1,0 +1,67 @@
+package actions
+
+import (
+	"crown_and_coin/engine"
+	"crown_and_coin/events"
+)
+
+// ActionType identifies the type of action
+type ActionType string
+
+const (
+	// Taxation phase actions
+	ActionTaxPeasantsLow  ActionType = "tax_peasants_low"  // 5 gold, no risk
+	ActionTaxPeasantsHigh ActionType = "tax_peasants_high" // 10 gold, revolt risk
+	ActionTaxMerchants    ActionType = "tax_merchants"
+
+	// Spending phase actions
+	ActionBuildArmy       ActionType = "build_army"
+	ActionMonarchInvest   ActionType = "monarch_invest" // Give gold to merchant
+	ActionMonarchSave     ActionType = "monarch_save"
+	ActionMerchantInvest  ActionType = "merchant_invest"
+	ActionMerchantHide    ActionType = "merchant_hide"
+
+	// War phase actions
+	ActionAttack ActionType = "attack"
+	ActionNoAttack ActionType = "no_attack"
+
+	// Assessment phase actions
+	ActionRemain ActionType = "remain"
+	ActionFlee   ActionType = "flee"
+	ActionRevolt ActionType = "revolt"
+)
+
+// Action defines the interface for a player action
+type Action interface {
+	// Type returns the action type
+	Type() ActionType
+
+	// PlayerID returns the ID of the player taking this action
+	PlayerID() string
+
+	// Validate checks if this action is valid given the current state
+	Validate(state *engine.GameState) error
+
+	// Apply executes the action and returns the new state and any events
+	Apply(state *engine.GameState, roller DiceRoller) (*engine.GameState, []events.Event)
+}
+
+// DiceRoller interface for injectable randomness
+type DiceRoller interface {
+	// Roll returns a random number between 1 and sides (inclusive)
+	Roll(sides int) int
+}
+
+// BaseAction provides common functionality for actions
+type BaseAction struct {
+	actionType ActionType
+	playerID   string
+}
+
+func (a *BaseAction) Type() ActionType {
+	return a.actionType
+}
+
+func (a *BaseAction) PlayerID() string {
+	return a.playerID
+}

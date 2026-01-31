@@ -1,0 +1,117 @@
+package engine
+
+// GameState represents the complete state of the game at any point
+type GameState struct {
+	Turn      int
+	Phase     PhaseType
+	Countries map[string]*Country
+	Merchants map[string]*Merchant
+}
+
+// PhaseType represents the different phases of a game turn
+type PhaseType int
+
+const (
+	PhaseTaxation PhaseType = iota + 1
+	PhaseNegotiation
+	PhaseSpending
+	PhaseWar
+	PhaseAssessment
+)
+
+// String returns the name of the phase
+func (p PhaseType) String() string {
+	switch p {
+	case PhaseTaxation:
+		return "Taxation"
+	case PhaseNegotiation:
+		return "Negotiation"
+	case PhaseSpending:
+		return "Spending & Investment"
+	case PhaseWar:
+		return "War"
+	case PhaseAssessment:
+		return "Internal Assessment"
+	default:
+		return "Unknown"
+	}
+}
+
+// NewGameState creates a new game state
+func NewGameState() *GameState {
+	return &GameState{
+		Turn:      1,
+		Phase:     PhaseTaxation,
+		Countries: make(map[string]*Country),
+		Merchants: make(map[string]*Merchant),
+	}
+}
+
+// AddCountry adds a country to the game
+func (gs *GameState) AddCountry(country *Country) {
+	gs.Countries[country.ID] = country
+}
+
+// AddMerchant adds a merchant to the game
+func (gs *GameState) AddMerchant(merchant *Merchant) {
+	gs.Merchants[merchant.ID] = merchant
+}
+
+// GetCountry returns a country by ID
+func (gs *GameState) GetCountry(id string) *Country {
+	return gs.Countries[id]
+}
+
+// GetMerchant returns a merchant by ID
+func (gs *GameState) GetMerchant(id string) *Merchant {
+	return gs.Merchants[id]
+}
+
+// GetMerchantsByCountry returns all merchants belonging to a country
+func (gs *GameState) GetMerchantsByCountry(countryID string) []*Merchant {
+	var merchants []*Merchant
+	for _, m := range gs.Merchants {
+		if m.CountryID == countryID {
+			merchants = append(merchants, m)
+		}
+	}
+	return merchants
+}
+
+// GetAliveCountries returns all countries that are still in the game
+func (gs *GameState) GetAliveCountries() []*Country {
+	var alive []*Country
+	for _, c := range gs.Countries {
+		if c.IsAlive() {
+			alive = append(alive, c)
+		}
+	}
+	return alive
+}
+
+// Clone creates a deep copy of the game state
+func (gs *GameState) Clone() *GameState {
+	newState := &GameState{
+		Turn:      gs.Turn,
+		Phase:     gs.Phase,
+		Countries: make(map[string]*Country),
+		Merchants: make(map[string]*Merchant),
+	}
+	for id, c := range gs.Countries {
+		newState.Countries[id] = c.Clone()
+	}
+	for id, m := range gs.Merchants {
+		newState.Merchants[id] = m.Clone()
+	}
+	return newState
+}
+
+// NextPhase advances to the next phase, or next turn if at the end
+func (gs *GameState) NextPhase() {
+	if gs.Phase == PhaseAssessment {
+		gs.Turn++
+		gs.Phase = PhaseTaxation
+	} else {
+		gs.Phase++
+	}
+}

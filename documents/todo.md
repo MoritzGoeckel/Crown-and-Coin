@@ -1,0 +1,4 @@
+- [ ] Add player input - Implement ActionProvider interface for CLI/network/AI
+- [ ] Add republic voting - Extend actions for merchant republics
+- [ ] Add persistence - Serialize GameState to JSON for save/load
+- [ ] Add unit tests - Use FixedDice for deterministic test scenarios

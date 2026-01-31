@@ -1,0 +1,188 @@
+package actions
+
+import (
+	"errors"
+	"crown_and_coin/engine"
+	"crown_and_coin/events"
+)
+
+// RemainAction - Merchant stays with current country
+type RemainAction struct {
+	BaseAction
+	MerchantID string
+}
+
+func NewRemainAction(playerID, merchantID string) *RemainAction {
+	return &RemainAction{
+		BaseAction: BaseAction{actionType: ActionRemain, playerID: playerID},
+		MerchantID: merchantID,
+	}
+}
+
+func (a *RemainAction) Validate(state *engine.GameState) error {
+	merchant := state.GetMerchant(a.MerchantID)
+	if merchant == nil {
+		return errors.New("merchant not found")
+	}
+	if merchant.ID != a.playerID {
+		return errors.New("can only control your own merchant")
+	}
+	country := state.GetCountry(merchant.CountryID)
+	if country == nil || !country.IsAlive() {
+		return errors.New("country is not alive")
+	}
+	return nil
+}
+
+func (a *RemainAction) Apply(state *engine.GameState, roller DiceRoller) (*engine.GameState, []events.Event) {
+	// Remaining is a no-op
+	return state.Clone(), nil
+}
+
+// FleeAction - Merchant flees to a different country
+type FleeAction struct {
+	BaseAction
+	MerchantID   string
+	ToCountryID  string
+}
+
+func NewFleeAction(playerID, merchantID, toCountryID string) *FleeAction {
+	return &FleeAction{
+		BaseAction:  BaseAction{actionType: ActionFlee, playerID: playerID},
+		MerchantID:  merchantID,
+		ToCountryID: toCountryID,
+	}
+}
+
+func (a *FleeAction) Validate(state *engine.GameState) error {
+	merchant := state.GetMerchant(a.MerchantID)
+	if merchant == nil {
+		return errors.New("merchant not found")
+	}
+	if merchant.ID != a.playerID {
+		return errors.New("can only control your own merchant")
+	}
+	if merchant.CountryID == a.ToCountryID {
+		return errors.New("already in that country")
+	}
+	toCountry := state.GetCountry(a.ToCountryID)
+	if toCountry == nil {
+		return errors.New("destination country not found")
+	}
+	if !toCountry.IsAlive() {
+		return errors.New("cannot flee to a defeated country")
+	}
+	return nil
+}
+
+func (a *FleeAction) Apply(state *engine.GameState, roller DiceRoller) (*engine.GameState, []events.Event) {
+	newState := state.Clone()
+	merchant := newState.GetMerchant(a.MerchantID)
+	var evts []events.Event
+
+	fromCountry := merchant.CountryID
+	goldTaken := merchant.StoredGold
+	goldLost := merchant.InvestedGold
+
+	merchant.FleeToCountry(a.ToCountryID)
+
+	evts = append(evts, events.NewMerchantFledEvent(
+		a.MerchantID, fromCountry, a.ToCountryID, goldTaken, goldLost,
+	))
+
+	return newState, evts
+}
+
+// RevoltAction - Merchant participates in revolt against monarch
+type RevoltAction struct {
+	BaseAction
+	MerchantID string
+	CountryID  string
+}
+
+func NewRevoltAction(playerID, merchantID, countryID string) *RevoltAction {
+	return &RevoltAction{
+		BaseAction: BaseAction{actionType: ActionRevolt, playerID: playerID},
+		MerchantID: merchantID,
+		CountryID:  countryID,
+	}
+}
+
+func (a *RevoltAction) Validate(state *engine.GameState) error {
+	merchant := state.GetMerchant(a.MerchantID)
+	if merchant == nil {
+		return errors.New("merchant not found")
+	}
+	if merchant.ID != a.playerID {
+		return errors.New("can only control your own merchant")
+	}
+	if merchant.CountryID != a.CountryID {
+		return errors.New("merchant not in this country")
+	}
+	country := state.GetCountry(a.CountryID)
+	if country == nil {
+		return errors.New("country not found")
+	}
+	if country.IsRepublic {
+		return errors.New("cannot revolt against a republic")
+	}
+	if !country.IsAlive() {
+		return errors.New("country is not alive")
+	}
+	return nil
+}
+
+func (a *RevoltAction) Apply(state *engine.GameState, roller DiceRoller) (*engine.GameState, []events.Event) {
+	// Individual revolt action just marks intention
+	// The actual revolt resolution happens in the phase
+	return state.Clone(), nil
+}
+
+// ResolveRevolt handles the actual revolt mechanics
+// This is called by the phase after collecting all revolt actions
+func ResolveRevolt(state *engine.GameState, countryID string, participantIDs []string) (*engine.GameState, []events.Event) {
+	newState := state.Clone()
+	country := newState.GetCountry(countryID)
+	var evts []events.Event
+
+	// Calculate total merchant gold
+	var merchantGold int
+	for _, mID := range participantIDs {
+		merchant := newState.GetMerchant(mID)
+		if merchant != nil {
+			merchantGold += merchant.TotalGold()
+		}
+	}
+
+	monarchGold := country.Gold
+
+	if merchantGold > monarchGold {
+		// Revolt succeeds
+		evts = append(evts, events.NewRevoltSuccessEvent(countryID, participantIDs, merchantGold))
+
+		// Country loses 2 HP
+		country.TakeDamage(2)
+
+		// Becomes a republic
+		country.BecomeRepublic()
+
+		evt := events.NewBaseEvent(events.EventRepublicFormed)
+		evt.Set("country_id", countryID)
+		evts = append(evts, evt)
+	} else {
+		// Revolt fails - all participating merchants lose their gold to the king
+		totalLost := 0
+		for _, mID := range participantIDs {
+			merchant := newState.GetMerchant(mID)
+			if merchant != nil {
+				lost := merchant.LoseAllGold()
+				totalLost += lost
+			}
+		}
+		country.AddGold(totalLost)
+
+		evts = append(evts, events.NewRevoltFailedEvent(countryID, participantIDs, totalLost))
+	}
+
+	return newState, evts
+}
