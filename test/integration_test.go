@@ -65,8 +65,8 @@ func TestRealisticGameScenario(t *testing.T) {
 		"player_id": "alice",
 		"phase": "taxation",
 		"actions": [
-			{"type": "tax_peasants_low", "player_id": "alice", "country_id": "Avalon", "high_tax": false},
-			{"type": "tax_peasants_high", "player_id": "alice", "country_id": "Avalon", "high_tax": true},
+			{"type": "tax_peasants_low", "player_id": "alice", "country_id": "Avalon"},
+			{"type": "tax_peasants_high", "player_id": "alice", "country_id": "Avalon"},
 			{"type": "tax_merchants", "player_id": "alice", "country_id": "Avalon", "merchant_id": "charlie", "amount": "<AMOUNT:0-0>"},
 			{"type": "tax_merchants", "player_id": "alice", "country_id": "Avalon", "merchant_id": "eve", "amount": "<AMOUNT:0-0>"}
 		]
@@ -153,6 +153,8 @@ func TestRealisticGameScenario(t *testing.T) {
 			{"type": "merchant_hide", "player_id": "charlie", "merchant_id": "charlie"}
 		]
 	}`)
+
+	// MGDO why does merchant_hide not have amount? Maybe add that or remove amount from invest?
 
 	// Submit spending actions
 	assertJSONResponse(t, api, `{

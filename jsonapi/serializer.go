@@ -64,7 +64,8 @@ func SerializeAction(action actions.Action, state *engine.GameState) ActionJSON 
 	switch a := action.(type) {
 	case *actions.TaxPeasantsAction:
 		aj.CountryID = a.CountryID
-		aj.HighTax = &a.HighTax
+		// Note: high_tax is not included - it's redundant since it can be inferred from type
+		// (tax_peasants_low vs tax_peasants_high)
 
 	case *actions.TaxMerchantsAction:
 		aj.CountryID = a.CountryID
