@@ -6,12 +6,15 @@ import "encoding/json"
 type RequestType string
 
 const (
-	RequestSetup      RequestType = "setup"
-	RequestGetState   RequestType = "get_state"
-	RequestGetActions RequestType = "get_actions"
-	RequestSubmit     RequestType = "submit"
-	RequestGetQueued  RequestType = "get_queued"
-	RequestAdvance    RequestType = "advance"
+	RequestGetPlayers    RequestType = "get_players"
+	RequestAddMerchant   RequestType = "add_merchant"
+	RequestAddCountry    RequestType = "add_country"
+	RequestRemoveMerchant RequestType = "remove_merchant"
+	RequestGetState      RequestType = "get_state"
+	RequestGetActions    RequestType = "get_actions"
+	RequestSubmit        RequestType = "submit"
+	RequestGetQueued     RequestType = "get_queued"
+	RequestAdvance       RequestType = "advance"
 )
 
 // Request is the base request structure - use Type to determine specific request
@@ -19,23 +22,24 @@ type Request struct {
 	Type RequestType `json:"type"`
 }
 
-// SetupRequest initializes a new game
-type SetupRequest struct {
-	Type      RequestType     `json:"type"`
-	Countries []CountrySetup  `json:"countries"`
-	Merchants []MerchantSetup `json:"merchants"`
+// AddMerchantRequest adds a merchant to the game
+type AddMerchantRequest struct {
+	Type      RequestType `json:"type"`
+	PlayerID  string      `json:"player_id"`
+	CountryID string      `json:"country_id"`
 }
 
-// CountrySetup defines initial country configuration
-type CountrySetup struct {
-	ID        string `json:"id"`
-	MonarchID string `json:"monarch_id"`
+// AddCountryRequest adds a country to the game
+type AddCountryRequest struct {
+	Type      RequestType `json:"type"`
+	CountryID string      `json:"country_id"`
+	MonarchID string      `json:"monarch_id"`
 }
 
-// MerchantSetup defines initial merchant configuration
-type MerchantSetup struct {
-	ID        string `json:"id"`
-	CountryID string `json:"country_id"`
+// RemoveMerchantRequest removes a merchant from the game
+type RemoveMerchantRequest struct {
+	Type     RequestType `json:"type"`
+	PlayerID string      `json:"player_id"`
 }
 
 // GetActionsRequest requests valid actions for a player
@@ -58,7 +62,6 @@ type ActionJSON struct {
 	MerchantID string `json:"merchant_id,omitempty"`
 	TargetID   string `json:"target_id,omitempty"` // For attacks, flee destination
 	Amount     any    `json:"amount,omitempty"`    // Can be int or placeholder string
-	HighTax    *bool  `json:"high_tax,omitempty"`  // For tax actions
 }
 
 // Response types
@@ -69,10 +72,34 @@ type ErrorResponse struct {
 	Error   string `json:"error"`
 }
 
-// SetupResponse confirms game setup
-type SetupResponse struct {
-	Success bool       `json:"success"`
-	State   *StateJSON `json:"state,omitempty"`
+// PlayerInfo describes a player's country and role
+type PlayerInfo struct {
+	CountryID string `json:"country_id"`
+	Role      string `json:"role"` // "monarch" or "merchant"
+}
+
+// GetPlayersResponse returns all players
+type GetPlayersResponse struct {
+	Success bool                   `json:"success"`
+	Players map[string]*PlayerInfo `json:"players"`
+}
+
+// AddMerchantResponse confirms merchant addition
+type AddMerchantResponse struct {
+	Success bool   `json:"success"`
+	Error   string `json:"error,omitempty"`
+}
+
+// AddCountryResponse confirms country addition
+type AddCountryResponse struct {
+	Success bool   `json:"success"`
+	Error   string `json:"error,omitempty"`
+}
+
+// RemoveMerchantResponse confirms merchant removal
+type RemoveMerchantResponse struct {
+	Success bool   `json:"success"`
+	Error   string `json:"error,omitempty"`
 }
 
 // StateResponse returns the current game state
@@ -83,15 +110,15 @@ type StateResponse struct {
 
 // StateJSON is the JSON representation of GameState
 type StateJSON struct {
-	Turn      int                     `json:"turn"`
-	Phase     string                  `json:"phase"`
-	Countries map[string]*CountryJSON `json:"countries"`
+	Turn      int                      `json:"turn"`
+	Phase     string                   `json:"phase"`
+	Countries map[string]*CountryJSON  `json:"countries"`
 	Merchants map[string]*MerchantJSON `json:"merchants"`
 }
 
 // CountryJSON is the JSON representation of Country
 type CountryJSON struct {
-	ID           string `json:"id"`
+	CountryID    string `json:"country_id"`
 	HP           int    `json:"hp"`
 	ArmyStrength int    `json:"army_strength"`
 	Gold         int    `json:"gold"`
@@ -103,7 +130,7 @@ type CountryJSON struct {
 
 // MerchantJSON is the JSON representation of Merchant
 type MerchantJSON struct {
-	ID           string `json:"id"`
+	PlayerID     string `json:"player_id"`
 	CountryID    string `json:"country_id"`
 	StoredGold   int    `json:"stored_gold"`
 	InvestedGold int    `json:"invested_gold"`
@@ -156,8 +183,25 @@ func ParseRequest(data []byte) (RequestType, interface{}, error) {
 	}
 
 	switch base.Type {
-	case RequestSetup:
-		var req SetupRequest
+	case RequestGetPlayers:
+		return base.Type, &base, nil
+
+	case RequestAddMerchant:
+		var req AddMerchantRequest
+		if err := json.Unmarshal(data, &req); err != nil {
+			return base.Type, nil, err
+		}
+		return base.Type, &req, nil
+
+	case RequestAddCountry:
+		var req AddCountryRequest
+		if err := json.Unmarshal(data, &req); err != nil {
+			return base.Type, nil, err
+		}
+		return base.Type, &req, nil
+
+	case RequestRemoveMerchant:
+		var req RemoveMerchantRequest
 		if err := json.Unmarshal(data, &req); err != nil {
 			return base.Type, nil, err
 		}

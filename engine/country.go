@@ -2,7 +2,7 @@ package engine
 
 // Country represents a nation in the game
 type Country struct {
-	ID           string `json:"id"`
+	ID           string `json:"country_id"`
 	HP           int    `json:"hp"`             // Health points, starts at 10
 	ArmyStrength int    `json:"army_strength"`  // Military power, starts at 0
 	Gold         int    `json:"gold"`           // Treasury

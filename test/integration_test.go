@@ -19,33 +19,51 @@ func TestRealisticGameScenario(t *testing.T) {
 	// ========================================
 	t.Log("=== SETUP ===")
 
-	assertJSONResponse(t, api, `{
-		"type": "setup",
-		"countries": [
-			{"id": "Avalon", "monarch_id": "alice"},
-			{"id": "Britannia", "monarch_id": "bob"}
-		],
-		"merchants": [
-			{"id": "charlie", "country_id": "Avalon"},
-			{"id": "eve", "country_id": "Avalon"},
-			{"id": "diana", "country_id": "Britannia"},
-			{"id": "frank", "country_id": "Britannia"}
-		]
-	}`, `{
+	// Add countries
+	assertJSONResponse(t, api, `{"type": "add_country", "country_id": "Avalon", "monarch_id": "alice"}`,
+		`{"success": true}`)
+	assertJSONResponse(t, api, `{"type": "add_country", "country_id": "Britannia", "monarch_id": "bob"}`,
+		`{"success": true}`)
+
+	// Add merchants
+	assertJSONResponse(t, api, `{"type": "add_merchant", "player_id": "charlie", "country_id": "Avalon"}`,
+		`{"success": true}`)
+	assertJSONResponse(t, api, `{"type": "add_merchant", "player_id": "eve", "country_id": "Avalon"}`,
+		`{"success": true}`)
+	assertJSONResponse(t, api, `{"type": "add_merchant", "player_id": "diana", "country_id": "Britannia"}`,
+		`{"success": true}`)
+	assertJSONResponse(t, api, `{"type": "add_merchant", "player_id": "frank", "country_id": "Britannia"}`,
+		`{"success": true}`)
+
+	// Verify initial state
+	assertJSONResponse(t, api, `{"type": "get_state"}`, `{
 		"success": true,
 		"state": {
 			"turn": 1,
 			"phase": "taxation",
 			"countries": {
-				"Avalon": {"id": "Avalon", "hp": 10, "army_strength": 0, "gold": 0, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-				"Britannia": {"id": "Britannia", "hp": 10, "army_strength": 0, "gold": 0, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
+				"Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 0, "gold": 0, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+				"Britannia": {"country_id": "Britannia", "hp": 10, "army_strength": 0, "gold": 0, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
 			},
 			"merchants": {
-				"charlie": {"id": "charlie", "country_id": "Avalon", "stored_gold": 0, "invested_gold": 0},
-				"eve": {"id": "eve", "country_id": "Avalon", "stored_gold": 0, "invested_gold": 0},
-				"diana": {"id": "diana", "country_id": "Britannia", "stored_gold": 0, "invested_gold": 0},
-				"frank": {"id": "frank", "country_id": "Britannia", "stored_gold": 0, "invested_gold": 0}
+				"charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 0, "invested_gold": 0},
+				"eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 0, "invested_gold": 0},
+				"diana": {"player_id": "diana", "country_id": "Britannia", "stored_gold": 0, "invested_gold": 0},
+				"frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 0, "invested_gold": 0}
 			}
+		}
+	}`)
+
+	// Verify get_players
+	assertJSONResponse(t, api, `{"type": "get_players"}`, `{
+		"success": true,
+		"players": {
+			"alice": {"country_id": "Avalon", "role": "monarch"},
+			"bob": {"country_id": "Britannia", "role": "monarch"},
+			"charlie": {"country_id": "Avalon", "role": "merchant"},
+			"eve": {"country_id": "Avalon", "role": "merchant"},
+			"diana": {"country_id": "Britannia", "role": "merchant"},
+			"frank": {"country_id": "Britannia", "role": "merchant"}
 		}
 	}`)
 
@@ -100,14 +118,14 @@ func TestRealisticGameScenario(t *testing.T) {
 			"turn": 1,
 			"phase": "negotiation",
 			"countries": {
-				"Avalon": {"id": "Avalon", "hp": 10, "army_strength": 0, "gold": 10, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-				"Britannia": {"id": "Britannia", "hp": 10, "army_strength": 0, "gold": 5, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
+				"Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 0, "gold": 10, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+				"Britannia": {"country_id": "Britannia", "hp": 10, "army_strength": 0, "gold": 5, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
 			},
 			"merchants": {
-				"charlie": {"id": "charlie", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
-				"eve": {"id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
-				"diana": {"id": "diana", "country_id": "Britannia", "stored_gold": 5, "invested_gold": 0},
-				"frank": {"id": "frank", "country_id": "Britannia", "stored_gold": 5, "invested_gold": 0}
+				"charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
+				"eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
+				"diana": {"player_id": "diana", "country_id": "Britannia", "stored_gold": 5, "invested_gold": 0},
+				"frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 5, "invested_gold": 0}
 			}
 		}
 	}`)
@@ -126,14 +144,14 @@ func TestRealisticGameScenario(t *testing.T) {
 			"turn": 1,
 			"phase": "spending",
 			"countries": {
-				"Avalon": {"id": "Avalon", "hp": 10, "army_strength": 0, "gold": 10, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-				"Britannia": {"id": "Britannia", "hp": 10, "army_strength": 0, "gold": 5, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
+				"Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 0, "gold": 10, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+				"Britannia": {"country_id": "Britannia", "hp": 10, "army_strength": 0, "gold": 5, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
 			},
 			"merchants": {
-				"charlie": {"id": "charlie", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
-				"eve": {"id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
-				"diana": {"id": "diana", "country_id": "Britannia", "stored_gold": 5, "invested_gold": 0},
-				"frank": {"id": "frank", "country_id": "Britannia", "stored_gold": 5, "invested_gold": 0}
+				"charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
+				"eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
+				"diana": {"player_id": "diana", "country_id": "Britannia", "stored_gold": 5, "invested_gold": 0},
+				"frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 5, "invested_gold": 0}
 			}
 		}
 	}`)
@@ -153,8 +171,6 @@ func TestRealisticGameScenario(t *testing.T) {
 			{"type": "merchant_hide", "player_id": "charlie", "merchant_id": "charlie"}
 		]
 	}`)
-
-	// MGDO why does merchant_hide not have amount? Maybe add that or remove amount from invest?
 
 	// Submit spending actions
 	assertJSONResponse(t, api, `{
@@ -178,14 +194,14 @@ func TestRealisticGameScenario(t *testing.T) {
 			"turn": 1,
 			"phase": "war",
 			"countries": {
-				"Avalon": {"id": "Avalon", "hp": 10, "army_strength": 8, "gold": 2, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-				"Britannia": {"id": "Britannia", "hp": 10, "army_strength": 3, "gold": 2, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
+				"Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 8, "gold": 2, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+				"Britannia": {"country_id": "Britannia", "hp": 10, "army_strength": 3, "gold": 2, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
 			},
 			"merchants": {
-				"charlie": {"id": "charlie", "country_id": "Avalon", "stored_gold": 2, "invested_gold": 3},
-				"eve": {"id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
-				"diana": {"id": "diana", "country_id": "Britannia", "stored_gold": 1, "invested_gold": 4},
-				"frank": {"id": "frank", "country_id": "Britannia", "stored_gold": 3, "invested_gold": 2}
+				"charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 2, "invested_gold": 3},
+				"eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
+				"diana": {"player_id": "diana", "country_id": "Britannia", "stored_gold": 1, "invested_gold": 4},
+				"frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 3, "invested_gold": 2}
 			}
 		}
 	}`)
@@ -214,14 +230,14 @@ func TestRealisticGameScenario(t *testing.T) {
 			"turn": 1,
 			"phase": "assessment",
 			"countries": {
-				"Avalon": {"id": "Avalon", "hp": 10, "army_strength": 4, "gold": 7, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-				"Britannia": {"id": "Britannia", "hp": 5, "army_strength": 1, "gold": 2, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
+				"Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 4, "gold": 7, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+				"Britannia": {"country_id": "Britannia", "hp": 5, "army_strength": 1, "gold": 2, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
 			},
 			"merchants": {
-				"charlie": {"id": "charlie", "country_id": "Avalon", "stored_gold": 2, "invested_gold": 3},
-				"eve": {"id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
-				"diana": {"id": "diana", "country_id": "Britannia", "stored_gold": 1, "invested_gold": 4},
-				"frank": {"id": "frank", "country_id": "Britannia", "stored_gold": 3, "invested_gold": 2}
+				"charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 2, "invested_gold": 3},
+				"eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
+				"diana": {"player_id": "diana", "country_id": "Britannia", "stored_gold": 1, "invested_gold": 4},
+				"frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 3, "invested_gold": 2}
 			}
 		}
 	}`)
@@ -252,14 +268,14 @@ func TestRealisticGameScenario(t *testing.T) {
 			"turn": 2,
 			"phase": "taxation",
 			"countries": {
-				"Avalon": {"id": "Avalon", "hp": 10, "army_strength": 4, "gold": 7, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-				"Britannia": {"id": "Britannia", "hp": 5, "army_strength": 1, "gold": 2, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
+				"Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 4, "gold": 7, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+				"Britannia": {"country_id": "Britannia", "hp": 5, "army_strength": 1, "gold": 2, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
 			},
 			"merchants": {
-				"charlie": {"id": "charlie", "country_id": "Avalon", "stored_gold": 2, "invested_gold": 3},
-				"eve": {"id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
-				"diana": {"id": "diana", "country_id": "Avalon", "stored_gold": 1, "invested_gold": 0},
-				"frank": {"id": "frank", "country_id": "Britannia", "stored_gold": 3, "invested_gold": 2}
+				"charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 2, "invested_gold": 3},
+				"eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
+				"diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 1, "invested_gold": 0},
+				"frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 3, "invested_gold": 2}
 			}
 		}
 	}`)
@@ -303,14 +319,14 @@ func TestRealisticGameScenario(t *testing.T) {
 			"turn": 2,
 			"phase": "negotiation",
 			"countries": {
-				"Avalon": {"id": "Avalon", "hp": 10, "army_strength": 4, "gold": 15, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-				"Britannia": {"id": "Britannia", "hp": 5, "army_strength": 1, "gold": 7, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
+				"Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 4, "gold": 15, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+				"Britannia": {"country_id": "Britannia", "hp": 5, "army_strength": 1, "gold": 7, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
 			},
 			"merchants": {
-				"charlie": {"id": "charlie", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 0},
-				"eve": {"id": "eve", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 0},
-				"diana": {"id": "diana", "country_id": "Avalon", "stored_gold": 6, "invested_gold": 0},
-				"frank": {"id": "frank", "country_id": "Britannia", "stored_gold": 12, "invested_gold": 0}
+				"charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 0},
+				"eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 0},
+				"diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 6, "invested_gold": 0},
+				"frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 12, "invested_gold": 0}
 			}
 		}
 	}`)
@@ -349,14 +365,14 @@ func TestRealisticGameScenario(t *testing.T) {
 			"turn": 2,
 			"phase": "war",
 			"countries": {
-				"Avalon": {"id": "Avalon", "hp": 10, "army_strength": 16, "gold": 3, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-				"Britannia": {"id": "Britannia", "hp": 5, "army_strength": 8, "gold": 0, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
+				"Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 16, "gold": 3, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+				"Britannia": {"country_id": "Britannia", "hp": 5, "army_strength": 8, "gold": 0, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
 			},
 			"merchants": {
-				"charlie": {"id": "charlie", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
-				"eve": {"id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
-				"diana": {"id": "diana", "country_id": "Avalon", "stored_gold": 3, "invested_gold": 3},
-				"frank": {"id": "frank", "country_id": "Britannia", "stored_gold": 6, "invested_gold": 6}
+				"charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
+				"eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
+				"diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 3, "invested_gold": 3},
+				"frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 6, "invested_gold": 6}
 			}
 		}
 	}`)
@@ -386,14 +402,14 @@ func TestRealisticGameScenario(t *testing.T) {
 			"turn": 2,
 			"phase": "assessment",
 			"countries": {
-				"Avalon": {"id": "Avalon", "hp": 10, "army_strength": 8, "gold": 8, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-				"Britannia": {"id": "Britannia", "hp": 1, "army_strength": 4, "gold": 0, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": true}
+				"Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 8, "gold": 8, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+				"Britannia": {"country_id": "Britannia", "hp": 1, "army_strength": 4, "gold": 0, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": true}
 			},
 			"merchants": {
-				"charlie": {"id": "charlie", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
-				"eve": {"id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
-				"diana": {"id": "diana", "country_id": "Avalon", "stored_gold": 3, "invested_gold": 3},
-				"frank": {"id": "frank", "country_id": "Britannia", "stored_gold": 6, "invested_gold": 6}
+				"charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
+				"eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
+				"diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 3, "invested_gold": 3},
+				"frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 6, "invested_gold": 6}
 			}
 		}
 	}`)
@@ -424,14 +440,14 @@ func TestRealisticGameScenario(t *testing.T) {
 			"turn": 3,
 			"phase": "taxation",
 			"countries": {
-				"Avalon": {"id": "Avalon", "hp": 10, "army_strength": 8, "gold": 8, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-				"Britannia": {"id": "Britannia", "hp": -1, "army_strength": 4, "gold": 0, "peasants": 1, "is_republic": true, "monarch_id": "", "died_once": true}
+				"Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 8, "gold": 8, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+				"Britannia": {"country_id": "Britannia", "hp": -1, "army_strength": 4, "gold": 0, "peasants": 1, "is_republic": true, "monarch_id": "", "died_once": true}
 			},
 			"merchants": {
-				"charlie": {"id": "charlie", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
-				"eve": {"id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
-				"diana": {"id": "diana", "country_id": "Avalon", "stored_gold": 3, "invested_gold": 3},
-				"frank": {"id": "frank", "country_id": "Britannia", "stored_gold": 6, "invested_gold": 6}
+				"charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
+				"eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
+				"diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 3, "invested_gold": 3},
+				"frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 6, "invested_gold": 6}
 			}
 		}
 	}`)
@@ -446,14 +462,14 @@ func TestRealisticGameScenario(t *testing.T) {
 			"turn": 3,
 			"phase": "taxation",
 			"countries": {
-				"Avalon": {"id": "Avalon", "hp": 10, "army_strength": 8, "gold": 8, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-				"Britannia": {"id": "Britannia", "hp": -1, "army_strength": 4, "gold": 0, "peasants": 1, "is_republic": true, "monarch_id": "", "died_once": true}
+				"Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 8, "gold": 8, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+				"Britannia": {"country_id": "Britannia", "hp": -1, "army_strength": 4, "gold": 0, "peasants": 1, "is_republic": true, "monarch_id": "", "died_once": true}
 			},
 			"merchants": {
-				"charlie": {"id": "charlie", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
-				"eve": {"id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
-				"diana": {"id": "diana", "country_id": "Avalon", "stored_gold": 3, "invested_gold": 3},
-				"frank": {"id": "frank", "country_id": "Britannia", "stored_gold": 6, "invested_gold": 6}
+				"charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
+				"eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
+				"diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 3, "invested_gold": 3},
+				"frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 6, "invested_gold": 6}
 			}
 		}
 	}`)

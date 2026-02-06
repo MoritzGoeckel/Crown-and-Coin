@@ -100,6 +100,15 @@ func (gs *GameState) GetMerchant(id string) *Merchant {
 	return gs.Merchants[id]
 }
 
+// RemoveMerchant removes a merchant from the game
+func (gs *GameState) RemoveMerchant(id string) bool {
+	if _, ok := gs.Merchants[id]; !ok {
+		return false
+	}
+	delete(gs.Merchants, id)
+	return true
+}
+
 // GetMerchantsByCountry returns all merchants belonging to a country
 func (gs *GameState) GetMerchantsByCountry(countryID string) []*Merchant {
 	var merchants []*Merchant

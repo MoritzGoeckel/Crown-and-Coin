@@ -2,7 +2,7 @@ package engine
 
 // Merchant represents a merchant player in the game
 type Merchant struct {
-	ID           string `json:"id"`
+	ID           string `json:"player_id"`
 	CountryID    string `json:"country_id"`    // Which country this merchant belongs to
 	StoredGold   int    `json:"stored_gold"`   // Personal savings (can take when fleeing)
 	InvestedGold int    `json:"invested_gold"` // Gold invested (doubles next turn, lost if fleeing)

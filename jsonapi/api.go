@@ -51,8 +51,14 @@ func (api *GameAPI) ProcessMessage(data []byte) ([]byte, error) {
 	var response interface{}
 
 	switch reqType {
-	case RequestSetup:
-		response = api.handleSetup(req.(*SetupRequest))
+	case RequestGetPlayers:
+		response = api.handleGetPlayers()
+	case RequestAddMerchant:
+		response = api.handleAddMerchant(req.(*AddMerchantRequest))
+	case RequestAddCountry:
+		response = api.handleAddCountry(req.(*AddCountryRequest))
+	case RequestRemoveMerchant:
+		response = api.handleRemoveMerchant(req.(*RemoveMerchantRequest))
 	case RequestGetState:
 		response = api.handleGetState()
 	case RequestGetActions:
@@ -70,29 +76,111 @@ func (api *GameAPI) ProcessMessage(data []byte) ([]byte, error) {
 	return json.Marshal(response)
 }
 
-func (api *GameAPI) handleSetup(req *SetupRequest) *SetupResponse {
-	// Create countries
-	countries := make([]*engine.Country, len(req.Countries))
-	for i, c := range req.Countries {
-		countries[i] = engine.NewCountry(c.ID, c.MonarchID)
+func (api *GameAPI) handleGetPlayers() *GetPlayersResponse {
+	state := api.engine.GetState()
+	players := make(map[string]*PlayerInfo)
+
+	// Add monarchs
+	for _, country := range state.Countries {
+		if !country.IsRepublic && country.MonarchID != "" {
+			players[country.MonarchID] = &PlayerInfo{
+				CountryID: country.ID,
+				Role:      "monarch",
+			}
+		}
 	}
 
-	// Create merchants
-	merchants := make([]*engine.Merchant, len(req.Merchants))
-	for i, m := range req.Merchants {
-		merchants[i] = engine.NewMerchant(m.ID, m.CountryID)
+	// Add merchants
+	for _, merchant := range state.Merchants {
+		players[merchant.ID] = &PlayerInfo{
+			CountryID: merchant.CountryID,
+			Role:      "merchant",
+		}
 	}
 
-	// Setup the game
-	api.engine.SetupGame(countries, merchants)
-
-	// Clear action queue
-	api.actionQueue = make([]actions.Action, 0)
-
-	return &SetupResponse{
+	return &GetPlayersResponse{
 		Success: true,
-		State:   SerializeState(api.engine.GetState()),
+		Players: players,
 	}
+}
+
+func (api *GameAPI) handleAddMerchant(req *AddMerchantRequest) *AddMerchantResponse {
+	state := api.engine.GetState()
+
+	// Check if player_id is already in use (as merchant or monarch)
+	if state.GetMerchant(req.PlayerID) != nil {
+		return &AddMerchantResponse{
+			Success: false,
+			Error:   fmt.Sprintf("player_id '%s' already exists as a merchant", req.PlayerID),
+		}
+	}
+	for _, country := range state.Countries {
+		if country.MonarchID == req.PlayerID {
+			return &AddMerchantResponse{
+				Success: false,
+				Error:   fmt.Sprintf("player_id '%s' already exists as a monarch", req.PlayerID),
+			}
+		}
+	}
+
+	// Check if country exists
+	if state.GetCountry(req.CountryID) == nil {
+		return &AddMerchantResponse{
+			Success: false,
+			Error:   fmt.Sprintf("country_id '%s' not found", req.CountryID),
+		}
+	}
+
+	merchant := engine.NewMerchant(req.PlayerID, req.CountryID)
+	state.AddMerchant(merchant)
+
+	return &AddMerchantResponse{Success: true}
+}
+
+func (api *GameAPI) handleAddCountry(req *AddCountryRequest) *AddCountryResponse {
+	state := api.engine.GetState()
+
+	// Check if country_id is already in use
+	if state.GetCountry(req.CountryID) != nil {
+		return &AddCountryResponse{
+			Success: false,
+			Error:   fmt.Sprintf("country_id '%s' already exists", req.CountryID),
+		}
+	}
+
+	// Check if monarch_id is already in use
+	for _, country := range state.Countries {
+		if country.MonarchID == req.MonarchID {
+			return &AddCountryResponse{
+				Success: false,
+				Error:   fmt.Sprintf("monarch_id '%s' already exists as a monarch", req.MonarchID),
+			}
+		}
+	}
+	if state.GetMerchant(req.MonarchID) != nil {
+		return &AddCountryResponse{
+			Success: false,
+			Error:   fmt.Sprintf("monarch_id '%s' already exists as a merchant", req.MonarchID),
+		}
+	}
+
+	country := engine.NewCountry(req.CountryID, req.MonarchID)
+	state.AddCountry(country)
+
+	return &AddCountryResponse{Success: true}
+}
+
+func (api *GameAPI) handleRemoveMerchant(req *RemoveMerchantRequest) *RemoveMerchantResponse {
+	state := api.engine.GetState()
+
+	if !state.RemoveMerchant(req.PlayerID) {
+		return &RemoveMerchantResponse{
+			Success: false,
+			Error:   fmt.Sprintf("player_id '%s' not found", req.PlayerID),
+		}
+	}
+
+	return &RemoveMerchantResponse{Success: true}
 }
 
 func (api *GameAPI) handleGetState() *StateResponse {

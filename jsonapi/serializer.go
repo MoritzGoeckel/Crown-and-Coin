@@ -33,7 +33,7 @@ func SerializeState(state *engine.GameState) *StateJSON {
 // SerializeCountry converts a Country to CountryJSON
 func SerializeCountry(c *engine.Country) *CountryJSON {
 	return &CountryJSON{
-		ID:           c.ID,
+		CountryID:    c.ID,
 		HP:           c.HP,
 		ArmyStrength: c.ArmyStrength,
 		Gold:         c.Gold,
@@ -47,7 +47,7 @@ func SerializeCountry(c *engine.Country) *CountryJSON {
 // SerializeMerchant converts a Merchant to MerchantJSON
 func SerializeMerchant(m *engine.Merchant) *MerchantJSON {
 	return &MerchantJSON{
-		ID:           m.ID,
+		PlayerID:     m.ID,
 		CountryID:    m.CountryID,
 		StoredGold:   m.StoredGold,
 		InvestedGold: m.InvestedGold,
@@ -132,11 +132,7 @@ func SerializeAction(action actions.Action, state *engine.GameState) ActionJSON 
 func DeserializeAction(aj ActionJSON) (actions.Action, error) {
 	switch actions.ActionType(aj.Type) {
 	case actions.ActionTaxPeasantsLow:
-		highTax := false
-		if aj.HighTax != nil {
-			highTax = *aj.HighTax
-		}
-		return actions.NewTaxPeasantsAction(aj.PlayerID, aj.CountryID, highTax), nil
+		return actions.NewTaxPeasantsAction(aj.PlayerID, aj.CountryID, false), nil
 
 	case actions.ActionTaxPeasantsHigh:
 		return actions.NewTaxPeasantsAction(aj.PlayerID, aj.CountryID, true), nil

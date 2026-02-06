@@ -22,52 +22,105 @@ func sendMessage[T any](t *testing.T, api *GameAPI, msg string) T {
 	return resp
 }
 
-func TestSetupGame(t *testing.T) {
+// setupGame is a helper that adds countries and merchants for tests
+func setupGame(t *testing.T, api *GameAPI) {
+	t.Helper()
+	sendMessage[AddCountryResponse](t, api, `{"type": "add_country", "country_id": "Avalon", "monarch_id": "alice"}`)
+	sendMessage[AddCountryResponse](t, api, `{"type": "add_country", "country_id": "Britannia", "monarch_id": "bob"}`)
+	sendMessage[AddMerchantResponse](t, api, `{"type": "add_merchant", "player_id": "charlie", "country_id": "Avalon"}`)
+	sendMessage[AddMerchantResponse](t, api, `{"type": "add_merchant", "player_id": "diana", "country_id": "Britannia"}`)
+}
+
+func TestAddCountry(t *testing.T) {
 	api := NewGameAPIWithDice(engine.NewSeededDice(42))
 
-	setupMsg := `{
-		"type": "setup",
-		"countries": [
-			{"id": "Avalon", "monarch_id": "alice"},
-			{"id": "Britannia", "monarch_id": "bob"}
-		],
-		"merchants": [
-			{"id": "charlie", "country_id": "Avalon"},
-			{"id": "diana", "country_id": "Britannia"}
-		]
-	}`
-
-	resp := sendMessage[SetupResponse](t, api, setupMsg)
-
+	resp := sendMessage[AddCountryResponse](t, api, `{"type": "add_country", "country_id": "Avalon", "monarch_id": "alice"}`)
 	if !resp.Success {
-		t.Fatal("Setup should succeed")
+		t.Fatal("AddCountry should succeed")
 	}
-	if resp.State == nil {
-		t.Fatal("Setup should return state")
+
+	// Duplicate should fail
+	resp = sendMessage[AddCountryResponse](t, api, `{"type": "add_country", "country_id": "Avalon", "monarch_id": "bob"}`)
+	if resp.Success {
+		t.Fatal("Duplicate country_id should fail")
 	}
-	if len(resp.State.Countries) != 2 {
-		t.Errorf("Expected 2 countries, got %d", len(resp.State.Countries))
+}
+
+func TestAddMerchant(t *testing.T) {
+	api := NewGameAPIWithDice(engine.NewSeededDice(42))
+
+	sendMessage[AddCountryResponse](t, api, `{"type": "add_country", "country_id": "Avalon", "monarch_id": "alice"}`)
+
+	resp := sendMessage[AddMerchantResponse](t, api, `{"type": "add_merchant", "player_id": "charlie", "country_id": "Avalon"}`)
+	if !resp.Success {
+		t.Fatal("AddMerchant should succeed")
 	}
-	if len(resp.State.Merchants) != 2 {
-		t.Errorf("Expected 2 merchants, got %d", len(resp.State.Merchants))
+
+	// Duplicate should fail
+	resp = sendMessage[AddMerchantResponse](t, api, `{"type": "add_merchant", "player_id": "charlie", "country_id": "Avalon"}`)
+	if resp.Success {
+		t.Fatal("Duplicate player_id should fail")
 	}
-	if resp.State.Phase != "taxation" {
-		t.Errorf("Expected phase 'taxation', got '%s'", resp.State.Phase)
+}
+
+func TestRemoveMerchant(t *testing.T) {
+	api := NewGameAPIWithDice(engine.NewSeededDice(42))
+
+	sendMessage[AddCountryResponse](t, api, `{"type": "add_country", "country_id": "Avalon", "monarch_id": "alice"}`)
+	sendMessage[AddMerchantResponse](t, api, `{"type": "add_merchant", "player_id": "charlie", "country_id": "Avalon"}`)
+
+	resp := sendMessage[RemoveMerchantResponse](t, api, `{"type": "remove_merchant", "player_id": "charlie"}`)
+	if !resp.Success {
+		t.Fatal("RemoveMerchant should succeed")
+	}
+
+	// Removing again should fail
+	resp = sendMessage[RemoveMerchantResponse](t, api, `{"type": "remove_merchant", "player_id": "charlie"}`)
+	if resp.Success {
+		t.Fatal("Removing non-existent merchant should fail")
+	}
+}
+
+func TestGetPlayers(t *testing.T) {
+	api := NewGameAPIWithDice(engine.NewSeededDice(42))
+
+	sendMessage[AddCountryResponse](t, api, `{"type": "add_country", "country_id": "Avalon", "monarch_id": "alice"}`)
+	sendMessage[AddMerchantResponse](t, api, `{"type": "add_merchant", "player_id": "charlie", "country_id": "Avalon"}`)
+
+	resp := sendMessage[GetPlayersResponse](t, api, `{"type": "get_players"}`)
+	if !resp.Success {
+		t.Fatal("GetPlayers should succeed")
+	}
+	if len(resp.Players) != 2 {
+		t.Errorf("Expected 2 players, got %d", len(resp.Players))
+	}
+
+	alice := resp.Players["alice"]
+	if alice == nil {
+		t.Fatal("Player alice not found")
+	}
+	if alice.Role != "monarch" {
+		t.Errorf("Expected alice role 'monarch', got '%s'", alice.Role)
+	}
+	if alice.CountryID != "Avalon" {
+		t.Errorf("Expected alice country 'Avalon', got '%s'", alice.CountryID)
+	}
+
+	charlie := resp.Players["charlie"]
+	if charlie == nil {
+		t.Fatal("Player charlie not found")
+	}
+	if charlie.Role != "merchant" {
+		t.Errorf("Expected charlie role 'merchant', got '%s'", charlie.Role)
 	}
 }
 
 func TestGetState(t *testing.T) {
 	api := NewGameAPIWithDice(engine.NewSeededDice(42))
 
-	// Setup first
-	setupMsg := `{
-		"type": "setup",
-		"countries": [{"id": "Avalon", "monarch_id": "alice"}],
-		"merchants": [{"id": "charlie", "country_id": "Avalon"}]
-	}`
-	sendMessage[SetupResponse](t, api, setupMsg)
+	sendMessage[AddCountryResponse](t, api, `{"type": "add_country", "country_id": "Avalon", "monarch_id": "alice"}`)
+	sendMessage[AddMerchantResponse](t, api, `{"type": "add_merchant", "player_id": "charlie", "country_id": "Avalon"}`)
 
-	// Get state
 	resp := sendMessage[StateResponse](t, api, `{"type": "get_state"}`)
 
 	if !resp.Success {
@@ -89,13 +142,8 @@ func TestGetState(t *testing.T) {
 func TestGetActions(t *testing.T) {
 	api := NewGameAPIWithDice(engine.NewSeededDice(42))
 
-	// Setup
-	setupMsg := `{
-		"type": "setup",
-		"countries": [{"id": "Avalon", "monarch_id": "alice"}],
-		"merchants": [{"id": "charlie", "country_id": "Avalon"}]
-	}`
-	sendMessage[SetupResponse](t, api, setupMsg)
+	sendMessage[AddCountryResponse](t, api, `{"type": "add_country", "country_id": "Avalon", "monarch_id": "alice"}`)
+	sendMessage[AddMerchantResponse](t, api, `{"type": "add_merchant", "player_id": "charlie", "country_id": "Avalon"}`)
 
 	// Get actions for monarch
 	resp := sendMessage[ActionsResponse](t, api, `{"type": "get_actions", "player_id": "alice"}`)
@@ -140,19 +188,14 @@ func TestGetActions(t *testing.T) {
 func TestSubmitActions(t *testing.T) {
 	api := NewGameAPIWithDice(engine.NewSeededDice(42))
 
-	// Setup
-	setupMsg := `{
-		"type": "setup",
-		"countries": [{"id": "Avalon", "monarch_id": "alice"}],
-		"merchants": [{"id": "charlie", "country_id": "Avalon"}]
-	}`
-	sendMessage[SetupResponse](t, api, setupMsg)
+	sendMessage[AddCountryResponse](t, api, `{"type": "add_country", "country_id": "Avalon", "monarch_id": "alice"}`)
+	sendMessage[AddMerchantResponse](t, api, `{"type": "add_merchant", "player_id": "charlie", "country_id": "Avalon"}`)
 
 	// Submit a tax action
 	submitMsg := `{
 		"type": "submit",
 		"actions": [
-			{"type": "tax_peasants_low", "player_id": "alice", "country_id": "Avalon", "high_tax": false}
+			{"type": "tax_peasants_low", "player_id": "alice", "country_id": "Avalon"}
 		]
 	}`
 	resp := sendMessage[SubmitResponse](t, api, submitMsg)
@@ -168,13 +211,8 @@ func TestSubmitActions(t *testing.T) {
 func TestGetQueued(t *testing.T) {
 	api := NewGameAPIWithDice(engine.NewSeededDice(42))
 
-	// Setup
-	setupMsg := `{
-		"type": "setup",
-		"countries": [{"id": "Avalon", "monarch_id": "alice"}],
-		"merchants": [{"id": "charlie", "country_id": "Avalon"}]
-	}`
-	sendMessage[SetupResponse](t, api, setupMsg)
+	sendMessage[AddCountryResponse](t, api, `{"type": "add_country", "country_id": "Avalon", "monarch_id": "alice"}`)
+	sendMessage[AddMerchantResponse](t, api, `{"type": "add_merchant", "player_id": "charlie", "country_id": "Avalon"}`)
 
 	// Submit action
 	submitMsg := `{
@@ -202,13 +240,8 @@ func TestGetQueued(t *testing.T) {
 func TestAdvance(t *testing.T) {
 	api := NewGameAPIWithDice(engine.NewSeededDice(42))
 
-	// Setup
-	setupMsg := `{
-		"type": "setup",
-		"countries": [{"id": "Avalon", "monarch_id": "alice"}],
-		"merchants": [{"id": "charlie", "country_id": "Avalon"}]
-	}`
-	sendMessage[SetupResponse](t, api, setupMsg)
+	sendMessage[AddCountryResponse](t, api, `{"type": "add_country", "country_id": "Avalon", "monarch_id": "alice"}`)
+	sendMessage[AddMerchantResponse](t, api, `{"type": "add_merchant", "player_id": "charlie", "country_id": "Avalon"}`)
 
 	// Submit tax action
 	submitMsg := `{
@@ -253,19 +286,7 @@ func TestAdvance(t *testing.T) {
 func TestFullTurnSimulation(t *testing.T) {
 	api := NewGameAPIWithDice(engine.NewSeededDice(42))
 
-	// Setup with two countries
-	setupMsg := `{
-		"type": "setup",
-		"countries": [
-			{"id": "Avalon", "monarch_id": "alice"},
-			{"id": "Britannia", "monarch_id": "bob"}
-		],
-		"merchants": [
-			{"id": "charlie", "country_id": "Avalon"},
-			{"id": "diana", "country_id": "Britannia"}
-		]
-	}`
-	sendMessage[SetupResponse](t, api, setupMsg)
+	setupGame(t, api)
 
 	// Phase 1: Taxation
 	// Both monarchs collect low tax
@@ -324,13 +345,8 @@ func TestFullTurnSimulation(t *testing.T) {
 func TestMerchantActions(t *testing.T) {
 	api := NewGameAPIWithDice(engine.NewSeededDice(42))
 
-	// Setup
-	setupMsg := `{
-		"type": "setup",
-		"countries": [{"id": "Avalon", "monarch_id": "alice"}],
-		"merchants": [{"id": "charlie", "country_id": "Avalon"}]
-	}`
-	sendMessage[SetupResponse](t, api, setupMsg)
+	sendMessage[AddCountryResponse](t, api, `{"type": "add_country", "country_id": "Avalon", "monarch_id": "alice"}`)
+	sendMessage[AddMerchantResponse](t, api, `{"type": "add_merchant", "player_id": "charlie", "country_id": "Avalon"}`)
 
 	// Advance through taxation (merchant gets 5 gold income)
 	sendMessage[SubmitResponse](t, api, `{
