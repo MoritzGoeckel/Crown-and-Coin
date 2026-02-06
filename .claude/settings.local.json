@@ -4,7 +4,8 @@
       "Bash(go mod init:*)",
       "Bash(go build:*)",
       "Bash(go run:*)",
-      "Bash(go test:*)"
+      "Bash(go test:*)",
+      "Bash(del \"C:\\\\Users\\\\morit\\\\crown_and_coin\\\\test\\\\integration_test.go\")"
     ]
   }
 }
