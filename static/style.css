@@ -102,13 +102,25 @@ header h1 {
     color: #ffd700;
 }
 
+#header-info {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
 #user-info {
     color: #aaa;
 }
 
+#phase-info {
+    color: #4ecdc4;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
 #game-content {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: 1rem;
     padding: 1rem;
     flex: 1;
@@ -117,6 +129,7 @@ header h1 {
 
 #state-panel,
 #actions-panel,
+#admin-panel,
 #console-panel {
     background: #16213e;
     border-radius: 8px;
@@ -128,20 +141,113 @@ header h1 {
 
 #state-panel h2,
 #actions-panel h2,
+#admin-panel h2,
 #console-panel h2 {
     color: #ffd700;
     margin-bottom: 1rem;
     font-size: 1.2rem;
 }
 
-#state-display {
-    flex: 1;
-    overflow: auto;
-    background: #0f0f1a;
-    padding: 1rem;
-    border-radius: 4px;
+#state-panel h2 {
+    margin-top: 1rem;
+}
+
+#state-panel h2:first-child {
+    margin-top: 0;
+}
+
+#countries-display,
+#merchants-display {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+}
+
+.country-card,
+.merchant-card {
+    background: #0f3460;
+    border-radius: 6px;
+    padding: 0.75rem;
+}
+
+.country-card.defeated {
+    opacity: 0.5;
+    border: 1px solid #ff6b6b;
+}
+
+.country-header,
+.merchant-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.country-name,
+.merchant-name {
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.country-status {
     font-size: 0.85rem;
-    white-space: pre-wrap;
+    color: #aaa;
+}
+
+.merchant-location {
+    font-size: 0.85rem;
+    color: #4ecdc4;
+}
+
+.health-bar {
+    position: relative;
+    height: 20px;
+    background: #1a1a2e;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.health-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+    transition: width 0.3s;
+}
+
+.health-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.country-stats,
+.merchant-stats {
+    display: flex;
+    gap: 1rem;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    color: #888;
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #ffd700;
 }
 
 #actions-list {
@@ -166,6 +272,76 @@ header h1 {
     background: #1a4a7a;
 }
 
+#admin-panel {
+    overflow-y: auto;
+}
+
+.admin-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #0f3460;
+}
+
+.admin-section:last-child {
+    border-bottom: none;
+}
+
+.admin-section h3 {
+    color: #4ecdc4;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+}
+
+.admin-section input,
+.admin-section select {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 4px;
+    background: #0f0f1a;
+    color: #eee;
+}
+
+.admin-section select {
+    cursor: pointer;
+}
+
+.admin-btn {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+    background: #0f3460;
+    color: #eee;
+}
+
+.admin-btn:hover {
+    background: #1a4a7a;
+}
+
+.admin-btn.primary {
+    background: #ffd700;
+    color: #1a1a2e;
+    font-weight: bold;
+}
+
+.admin-btn.primary:hover {
+    background: #ffed4a;
+}
+
+.admin-btn.danger {
+    background: #cc3333;
+}
+
+.admin-btn.danger:hover {
+    background: #ff4444;
+}
+
 #console-output {
     flex: 1;
     overflow: auto;
@@ -173,7 +349,7 @@ header h1 {
     padding: 1rem;
     border-radius: 4px;
     font-family: monospace;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     margin-bottom: 1rem;
 }
 
@@ -210,6 +386,8 @@ header h1 {
     margin-bottom: 0.5rem;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid #333;
+    white-space: pre-wrap;
+    word-break: break-all;
 }
 
 .log-entry.sent {

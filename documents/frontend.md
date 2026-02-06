@@ -9,3 +9,32 @@ The websocket messages follow that patter:
 - [x] If a message from a user has the wrong secret, it should be discarded and a error message printed and returned to the client
 - [x] The server should start a game using the engine.
 - [x] Check test\scenarios.json to understand the possible messages, create a verification method to check if the "user" is allowed to send this message. The admin user can send any message. The response of the engine should be send back via websocket to the client. Everyone can request get_state
+
+# Now we want to make the interface less technical
+
+## Lets start with the admin window
+
+- [x] The game state should be requested every 5 seconds and rendered in a nice way on the page
+- [x] The admin has an interface to create, edit and delete countries. When doing so the server is notified using the appropriate message
+- [x] The admin also has an non technical way to re assign players as merchants or monarchs for countries (using the messages)
+- [x] The admin can advance the phases, it should send the message to the server
+
+## I observed two bugs that need fixing
+
+- [ ] The dropdown for the kingdom closes when a new game state is received. This should only happen if the new game state is actually different.
+- [ ] Whenever a player or admin sends a message to the server and received the response, it should ask for a game state update
+
+## Player management
+
+- [ ] The server should provide a way to get the names of all connected players, don't confuse that with the get_player message of the game engine
+- [ ] The admin should see the current list of players, whenever a player joins he should get the update message via websocket
+- [ ] The admin should be only able to create countries with monarchs that actually are in the player pool
+
+## Player interface
+
+- [ ] The players should also have a good overview over the game state, think about what can logic/code can be shared with the rendering of the admin page
+- [ ] The players should have a visualization of their possible actions (get_actions message), this should update regularily, maybe every 5 seconds, so we know when the game state changed
+
+## General
+
+- [ ] There should be a logout button

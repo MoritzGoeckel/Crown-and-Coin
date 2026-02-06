@@ -22,18 +22,52 @@
         <div id="game-screen" class="screen hidden">
             <header>
                 <h1>Crown & Coin</h1>
-                <span id="user-info"></span>
+                <div id="header-info">
+                    <span id="user-info"></span>
+                    <span id="phase-info"></span>
+                </div>
             </header>
 
             <div id="game-content">
                 <div id="state-panel">
-                    <h2>Game State</h2>
-                    <pre id="state-display"></pre>
+                    <h2>Kingdoms</h2>
+                    <div id="countries-display"></div>
+                    <h2>Merchants</h2>
+                    <div id="merchants-display"></div>
                 </div>
 
                 <div id="actions-panel">
                     <h2>Actions</h2>
                     <div id="actions-list"></div>
+                </div>
+
+                <div id="admin-panel" class="hidden">
+                    <h2>Admin Controls</h2>
+
+                    <div class="admin-section">
+                        <h3>Phase Control</h3>
+                        <button id="advance-btn" class="admin-btn primary">Advance Phase</button>
+                    </div>
+
+                    <div class="admin-section">
+                        <h3>Add Country</h3>
+                        <input type="text" id="new-country-id" placeholder="Country Name">
+                        <input type="text" id="new-monarch-id" placeholder="Monarch Name">
+                        <button id="add-country-btn" class="admin-btn">Add Country</button>
+                    </div>
+
+                    <div class="admin-section">
+                        <h3>Add Merchant</h3>
+                        <input type="text" id="new-merchant-id" placeholder="Merchant Name">
+                        <select id="merchant-country-select"></select>
+                        <button id="add-merchant-btn" class="admin-btn">Add Merchant</button>
+                    </div>
+
+                    <div class="admin-section">
+                        <h3>Remove Player</h3>
+                        <select id="remove-player-select"></select>
+                        <button id="remove-player-btn" class="admin-btn danger">Remove</button>
+                    </div>
                 </div>
 
                 <div id="console-panel">
