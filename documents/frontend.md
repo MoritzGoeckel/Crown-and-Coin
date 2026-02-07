@@ -21,20 +21,24 @@ The websocket messages follow that patter:
 
 ## I observed two bugs that need fixing
 
-- [ ] The dropdown for the kingdom closes when a new game state is received. This should only happen if the new game state is actually different.
-- [ ] Whenever a player or admin sends a message to the server and received the response, it should ask for a game state update
+- [x] The dropdown for the kingdom closes when a new game state is received. This should only happen if the new game state is actually different.
+- [x] Whenever a player or admin sends a message to the server and received the response, it should ask for a game state update
 
 ## Player management
 
-- [ ] The server should provide a way to get the names of all connected players, don't confuse that with the get_player message of the game engine
-- [ ] The admin should see the current list of players, whenever a player joins he should get the update message via websocket
-- [ ] The admin should be only able to create countries with monarchs that actually are in the player pool
+- [x] The server should provide a way to get the names of all connected players, don't confuse that with the get_player message of the game engine
+- [x] The admin should see the current list of players, whenever a player joins he should get the update message via websocket
+- [x] The admin should be only able to create countries with monarchs that actually are in the player pool
 
 ## Player interface
 
-- [ ] The players should also have a good overview over the game state, think about what can logic/code can be shared with the rendering of the admin page
-- [ ] The players should have a visualization of their possible actions (get_actions message), this should update regularily, maybe every 5 seconds, so we know when the game state changed
+- [x] The players should also have a good overview over the game state, think about what can logic/code can be shared with the rendering of the admin page
+- [x] The players should have a visualization of their possible actions (get_actions message), this should update regularily, maybe every 5 seconds, so we know when the game state changed
 
 ## General
 
-- [ ] There should be a logout button
+- [x] There should be a logout button
+
+## 
+
+- [ ] The drop down for merchant name should be populated by players in admin menu

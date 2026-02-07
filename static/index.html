@@ -25,6 +25,7 @@
                 <div id="header-info">
                     <span id="user-info"></span>
                     <span id="phase-info"></span>
+                    <button id="logout-btn">Logout</button>
                 </div>
             </header>
 
@@ -45,6 +46,11 @@
                     <h2>Admin Controls</h2>
 
                     <div class="admin-section">
+                        <h3>Connected Players</h3>
+                        <div id="connected-players-list"></div>
+                    </div>
+
+                    <div class="admin-section">
                         <h3>Phase Control</h3>
                         <button id="advance-btn" class="admin-btn primary">Advance Phase</button>
                     </div>
@@ -52,7 +58,9 @@
                     <div class="admin-section">
                         <h3>Add Country</h3>
                         <input type="text" id="new-country-id" placeholder="Country Name">
-                        <input type="text" id="new-monarch-id" placeholder="Monarch Name">
+                        <select id="new-monarch-id">
+                            <option value="">Select Monarch...</option>
+                        </select>
                         <button id="add-country-btn" class="admin-btn">Add Country</button>
                     </div>
 

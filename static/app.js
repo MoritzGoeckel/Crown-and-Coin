@@ -2,7 +2,10 @@ let ws = null;
 let currentUser = null;
 let currentSecret = null;
 let gameState = null;
+let lastStateJSON = '';
+let connectedPlayers = [];
 let refreshInterval = null;
+let pendingUserActions = 0;
 
 const loginScreen = document.getElementById('login-screen');
 const gameScreen = document.getElementById('game-screen');
@@ -20,10 +23,12 @@ const adminPanel = document.getElementById('admin-panel');
 const consoleOutput = document.getElementById('console-output');
 const consoleInput = document.getElementById('console-input');
 const sendBtn = document.getElementById('send-btn');
+const logoutBtn = document.getElementById('logout-btn');
 
 registerBtn.addEventListener('click', register);
 connectBtn.addEventListener('click', connect);
 sendBtn.addEventListener('click', sendConsoleMessage);
+logoutBtn.addEventListener('click', logout);
 consoleInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendConsoleMessage();
 });
@@ -34,7 +39,7 @@ document.getElementById('advance-btn').addEventListener('click', () => {
 
 document.getElementById('add-country-btn').addEventListener('click', () => {
     const countryId = document.getElementById('new-country-id').value.trim();
-    const monarchId = document.getElementById('new-monarch-id').value.trim();
+    const monarchId = document.getElementById('new-monarch-id').value;
     if (countryId && monarchId) {
         send({ type: 'add_country', country_id: countryId, monarch_id: monarchId });
         document.getElementById('new-country-id').value = '';
@@ -111,6 +116,9 @@ function connect() {
 
         if (currentUser === 'admin') {
             adminPanel.classList.remove('hidden');
+            document.getElementById('game-content').style.gridTemplateColumns = '1fr 1fr 1fr 1fr';
+        } else {
+            document.getElementById('game-content').style.gridTemplateColumns = '1fr 1fr 1fr';
         }
 
         log('Connected to server', 'received');
@@ -119,6 +127,7 @@ function connect() {
 
         refreshInterval = setInterval(() => {
             refreshState();
+            refreshActions();
         }, 5000);
     };
 
@@ -126,14 +135,34 @@ function connect() {
         const data = JSON.parse(event.data);
         log('Received: ' + JSON.stringify(data, null, 2), data.success === false ? 'error' : 'received');
 
+        // Handle connected_players broadcast
+        if (data.type === 'connected_players') {
+            connectedPlayers = (data.players || []).sort();
+            renderConnectedPlayers();
+            updateMonarchSelect();
+            return;
+        }
+
+        // Only re-render state if it actually changed
         if (data.state) {
-            gameState = data.state;
-            renderState(data.state);
-            updateAdminSelects();
+            const newStateJSON = JSON.stringify(data.state);
+            if (newStateJSON !== lastStateJSON) {
+                lastStateJSON = newStateJSON;
+                gameState = data.state;
+                renderState(data.state);
+                updateAdminSelects();
+            }
         }
 
         if (data.actions !== undefined) {
             renderActions(data.actions);
+        }
+
+        // After receiving response to a user action, request fresh state
+        if (pendingUserActions > 0) {
+            pendingUserActions--;
+            refreshState();
+            refreshActions();
         }
     };
 
@@ -145,6 +174,7 @@ function connect() {
         log('Disconnected from server', 'error');
         if (refreshInterval) {
             clearInterval(refreshInterval);
+            refreshInterval = null;
         }
     };
 }
@@ -163,6 +193,12 @@ function send(payload) {
 
     ws.send(JSON.stringify(message));
     log('Sent: ' + JSON.stringify(payload, null, 2), 'sent');
+
+    // Track non-refresh messages so we can auto-refresh after response
+    const type = payload.type;
+    if (type !== 'get_state' && type !== 'get_actions' && type !== 'get_connected_players') {
+        pendingUserActions++;
+    }
 }
 
 function sendConsoleMessage() {
@@ -191,7 +227,40 @@ function refreshState() {
 }
 
 function refreshActions() {
-    send({ type: 'get_actions', player_id: currentUser });
+    if (currentUser && currentUser !== 'admin') {
+        send({ type: 'get_actions', player_id: currentUser });
+    }
+}
+
+function logout() {
+    if (ws) {
+        ws.close();
+        ws = null;
+    }
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = null;
+    }
+    currentUser = null;
+    currentSecret = null;
+    gameState = null;
+    lastStateJSON = '';
+    connectedPlayers = [];
+    pendingUserActions = 0;
+
+    gameScreen.classList.add('hidden');
+    adminPanel.classList.add('hidden');
+    loginScreen.classList.remove('hidden');
+
+    usernameInput.value = '';
+    secretInput.value = '';
+    loginError.textContent = '';
+    loginError.style.color = '#ff6b6b';
+
+    countriesDisplay.innerHTML = '';
+    merchantsDisplay.innerHTML = '';
+    actionsList.innerHTML = '';
+    consoleOutput.innerHTML = '';
 }
 
 function renderState(state) {
@@ -262,6 +331,7 @@ function updateAdminSelects() {
     if (!gameState || currentUser !== 'admin') return;
 
     const countrySelect = document.getElementById('merchant-country-select');
+    const prevCountry = countrySelect.value;
     countrySelect.innerHTML = '';
     for (const countryId of Object.keys(gameState.countries || {})) {
         const option = document.createElement('option');
@@ -269,8 +339,10 @@ function updateAdminSelects() {
         option.textContent = countryId;
         countrySelect.appendChild(option);
     }
+    if (prevCountry) countrySelect.value = prevCountry;
 
     const playerSelect = document.getElementById('remove-player-select');
+    const prevPlayer = playerSelect.value;
     playerSelect.innerHTML = '';
     for (const merchantId of Object.keys(gameState.merchants || {})) {
         const option = document.createElement('option');
@@ -278,6 +350,42 @@ function updateAdminSelects() {
         option.textContent = merchantId;
         playerSelect.appendChild(option);
     }
+    if (prevPlayer) playerSelect.value = prevPlayer;
+}
+
+function renderConnectedPlayers() {
+    const list = document.getElementById('connected-players-list');
+    if (!list) return;
+
+    list.innerHTML = '';
+    if (connectedPlayers.length === 0) {
+        list.innerHTML = '<div class="no-players">No players connected</div>';
+        return;
+    }
+
+    connectedPlayers.forEach(name => {
+        const tag = document.createElement('span');
+        tag.className = 'player-tag';
+        tag.textContent = name;
+        list.appendChild(tag);
+    });
+}
+
+function updateMonarchSelect() {
+    const select = document.getElementById('new-monarch-id');
+    if (!select) return;
+
+    const prevValue = select.value;
+    select.innerHTML = '<option value="">Select Monarch...</option>';
+
+    connectedPlayers.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+    });
+
+    if (prevValue) select.value = prevValue;
 }
 
 function formatPhase(phase) {
@@ -289,6 +397,16 @@ function formatPhase(phase) {
         'assessment': 'Assessment'
     };
     return phases[phase] || phase;
+}
+
+function parseAmountRange(value) {
+    if (typeof value === 'string') {
+        const match = value.match(/^<AMOUNT:(\d+)-(\d+)>$/);
+        if (match) {
+            return { min: parseInt(match[1]), max: parseInt(match[2]) };
+        }
+    }
+    return null;
 }
 
 function renderActions(actions) {
@@ -303,15 +421,59 @@ function renderActions(actions) {
     }
 
     actions.forEach(action => {
-        const btn = document.createElement('button');
-        btn.textContent = formatAction(action);
-        btn.addEventListener('click', () => {
-            send({ type: 'submit', actions: [action] });
-            setTimeout(refreshState, 100);
-            setTimeout(refreshActions, 100);
-        });
-        actionsList.appendChild(btn);
+        const range = parseAmountRange(action.amount);
+
+        if (range) {
+            const container = document.createElement('div');
+            container.className = 'action-with-amount';
+
+            const label = document.createElement('span');
+            label.className = 'action-label';
+            label.textContent = formatActionLabel(action);
+
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.min = range.min;
+            input.max = range.max;
+            input.value = range.max > 0 ? range.max : range.min;
+            input.className = 'amount-input';
+
+            const btn = document.createElement('button');
+            btn.textContent = 'Go';
+            btn.addEventListener('click', () => {
+                const amount = parseInt(input.value);
+                if (!isNaN(amount) && amount >= range.min && amount <= range.max) {
+                    const submitAction = { ...action, amount };
+                    send({ type: 'submit', actions: [submitAction] });
+                }
+            });
+
+            container.appendChild(label);
+            container.appendChild(input);
+            container.appendChild(btn);
+            actionsList.appendChild(container);
+        } else {
+            const btn = document.createElement('button');
+            btn.textContent = formatAction(action);
+            btn.addEventListener('click', () => {
+                send({ type: 'submit', actions: [action] });
+            });
+            actionsList.appendChild(btn);
+        }
     });
+}
+
+function formatActionLabel(action) {
+    switch (action.type) {
+        case 'tax_merchants':
+            return `Tax ${action.merchant_id}`;
+        case 'merchant_invest':
+            return 'Invest';
+        case 'build_army':
+            return 'Build Army';
+        default:
+            return formatAction(action);
+    }
 }
 
 function formatAction(action) {
@@ -321,7 +483,7 @@ function formatAction(action) {
         case 'tax_peasants_high':
             return 'Tax Peasants (High)';
         case 'tax_merchants':
-            return `Tax ${action.merchant_id}`;
+            return `Tax ${action.merchant_id} (${action.amount})`;
         case 'build_army':
             return `Build Army (${action.amount})`;
         case 'merchant_invest':

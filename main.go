@@ -20,11 +20,30 @@ type User struct {
 	Secret string
 }
 
+type ClientConn struct {
+	conn *websocket.Conn
+	mu   sync.Mutex
+}
+
+func (c *ClientConn) send(data []byte) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.conn.WriteMessage(websocket.TextMessage, data)
+}
+
+func (c *ClientConn) sendError(message string) {
+	resp, _ := json.Marshal(ErrorResponse{Success: false, Error: message})
+	c.send(resp)
+}
+
 type Server struct {
 	users    map[string]*User // name -> user
 	mu       sync.RWMutex
 	api      *jsonapi.GameAPI
 	upgrader websocket.Upgrader
+
+	clients   map[string]*ClientConn
+	clientsMu sync.RWMutex
 }
 
 type ClientMessage struct {
@@ -40,8 +59,9 @@ type ErrorResponse struct {
 
 func NewServer() *Server {
 	return &Server{
-		users: make(map[string]*User),
-		api:   jsonapi.NewGameAPIWithDice(engine.NewSeededDice(42)),
+		users:   make(map[string]*User),
+		clients: make(map[string]*ClientConn),
+		api:     jsonapi.NewGameAPIWithDice(engine.NewSeededDice(42)),
 		upgrader: websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
 				return true
@@ -97,7 +117,7 @@ func (s *Server) canSendMessage(user string, payload json.RawMessage) bool {
 	}
 
 	switch msg.Type {
-	case "get_state", "get_players":
+	case "get_state", "get_players", "get_connected_players":
 		return true
 	case "get_actions":
 		return msg.PlayerID == user
@@ -124,6 +144,41 @@ func (s *Server) canSendMessage(user string, payload json.RawMessage) bool {
 	}
 }
 
+func (s *Server) getConnectedPlayerNames() []string {
+	s.clientsMu.RLock()
+	defer s.clientsMu.RUnlock()
+
+	names := make([]string, 0, len(s.clients))
+	for name := range s.clients {
+		if name != "admin" {
+			names = append(names, name)
+		}
+	}
+	return names
+}
+
+func (s *Server) broadcastConnectedPlayers() {
+	s.clientsMu.RLock()
+	defer s.clientsMu.RUnlock()
+
+	names := make([]string, 0, len(s.clients))
+	for name := range s.clients {
+		if name != "admin" {
+			names = append(names, name)
+		}
+	}
+
+	msg, _ := json.Marshal(map[string]interface{}{
+		"type":    "connected_players",
+		"success": true,
+		"players": names,
+	})
+
+	for _, client := range s.clients {
+		client.send(msg)
+	}
+}
+
 func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	conn, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -133,6 +188,21 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	defer conn.Close()
 
 	log.Printf("New WebSocket connection from %s", r.RemoteAddr)
+
+	client := &ClientConn{conn: conn}
+	var connUser string
+
+	defer func() {
+		if connUser != "" {
+			s.clientsMu.Lock()
+			if existing, ok := s.clients[connUser]; ok && existing == client {
+				delete(s.clients, connUser)
+			}
+			s.clientsMu.Unlock()
+			log.Printf("Player disconnected: %s", connUser)
+			s.broadcastConnectedPlayers()
+		}
+	}()
 
 	for {
 		_, message, err := conn.ReadMessage()
@@ -146,40 +216,61 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 		var clientMsg ClientMessage
 		if err := json.Unmarshal(message, &clientMsg); err != nil {
 			log.Printf("Invalid message format: %v", err)
-			s.sendError(conn, "invalid message format")
+			client.sendError("invalid message format")
 			continue
 		}
 
 		if !s.authenticateUser(clientMsg.User, clientMsg.Secret) {
 			log.Printf("Authentication failed for user: %s", clientMsg.User)
-			s.sendError(conn, "authentication failed")
+			client.sendError("authentication failed")
 			continue
+		}
+
+		// Register connection on first authenticated message
+		if connUser == "" {
+			connUser = clientMsg.User
+			s.clientsMu.Lock()
+			s.clients[connUser] = client
+			s.clientsMu.Unlock()
+			log.Printf("Player connected: %s", connUser)
+			s.broadcastConnectedPlayers()
 		}
 
 		if !s.canSendMessage(clientMsg.User, clientMsg.Payload) {
 			log.Printf("Permission denied for user %s", clientMsg.User)
-			s.sendError(conn, "permission denied")
+			client.sendError("permission denied")
+			continue
+		}
+
+		// Handle get_connected_players separately (not part of game engine)
+		var msgType struct {
+			Type string `json:"type"`
+		}
+		json.Unmarshal(clientMsg.Payload, &msgType)
+
+		if msgType.Type == "get_connected_players" {
+			names := s.getConnectedPlayerNames()
+			resp, _ := json.Marshal(map[string]interface{}{
+				"type":    "connected_players",
+				"success": true,
+				"players": names,
+			})
+			client.send(resp)
 			continue
 		}
 
 		response, err := s.api.ProcessMessage(clientMsg.Payload)
 		if err != nil {
 			log.Printf("Engine error: %v", err)
-			s.sendError(conn, err.Error())
+			client.sendError(err.Error())
 			continue
 		}
 
-		if err := conn.WriteMessage(websocket.TextMessage, response); err != nil {
+		if err := client.send(response); err != nil {
 			log.Printf("Write error: %v", err)
 			break
 		}
 	}
-}
-
-func (s *Server) sendError(conn *websocket.Conn, message string) {
-	resp := ErrorResponse{Success: false, Error: message}
-	data, _ := json.Marshal(resp)
-	conn.WriteMessage(websocket.TextMessage, data)
 }
 
 func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
