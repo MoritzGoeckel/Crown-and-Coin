@@ -206,6 +206,11 @@ function connectToServer(name, secret) {
             // Clear rejected actions on successful submit
             renderRejectedActions([]);
         }
+
+        // Refresh queued actions after submit response
+        if (data.queued_actions !== undefined) {
+            refreshQueuedActions();
+        }
     };
 
     ws.onerror = (err) => {
