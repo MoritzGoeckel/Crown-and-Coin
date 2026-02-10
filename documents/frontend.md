@@ -49,4 +49,16 @@ The websocket messages follow that patter:
 
 - [x] Invest amount changes on update
 
-- [ ] Attack action missing
+- [ ] Attack action missing?
+
+
+# frontend
+- [ ] Login works even though you are not registered
+- [ ] Remove players does not work
+
+# engine
+- [ ] Queue multiple actions
+- [ ] Invest <AMOUNT:0-5> shown
+
+# frontend
+- [ ] New game

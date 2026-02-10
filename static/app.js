@@ -5,7 +5,6 @@ let gameState = null;
 let lastStateJSON = '';
 let connectedPlayers = [];
 let refreshInterval = null;
-let pendingUserActions = 0;
 
 const loginScreen = document.getElementById('login-screen');
 const gameScreen = document.getElementById('game-screen');
@@ -181,14 +180,6 @@ function connectToServer(name, secret) {
                 renderActions(data.actions);
             }
         }
-
-        // After receiving response to a user action, request fresh state
-        if (pendingUserActions > 0) {
-            pendingUserActions--;
-            refreshState();
-            refreshActions();
-            refreshQueuedActions();
-        }
     };
 
     ws.onerror = (err) => {
@@ -218,12 +209,6 @@ function send(payload) {
 
     ws.send(JSON.stringify(message));
     log('Sent: ' + JSON.stringify(payload, null, 2), 'sent');
-
-    // Track non-refresh messages so we can auto-refresh after response
-    const type = payload.type;
-    if (type !== 'get_state' && type !== 'get_actions' && type !== 'get_queued' && type !== 'get_connected_players') {
-        pendingUserActions++;
-    }
 }
 
 function log(message, type = 'received') {
@@ -265,7 +250,6 @@ function logout() {
     gameState = null;
     lastStateJSON = '';
     connectedPlayers = [];
-    pendingUserActions = 0;
 
     gameScreen.classList.add('hidden');
     adminPanel.classList.add('hidden');
