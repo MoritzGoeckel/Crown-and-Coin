@@ -66,7 +66,7 @@ func (api *GameAPI) ProcessMessage(data []byte) ([]byte, error) {
 	case RequestSubmit:
 		response = api.handleSubmit(req.(*SubmitRequest))
 	case RequestGetQueued:
-		response = api.handleGetQueued()
+		response = api.handleGetQueued(req.(*GetQueuedRequest))
 	case RequestAdvance:
 		response = api.handleAdvance()
 	default:
@@ -247,18 +247,22 @@ func (api *GameAPI) handleSubmit(req *SubmitRequest) *SubmitResponse {
 	}
 }
 
-func (api *GameAPI) handleGetQueued() *QueuedResponse {
+func (api *GameAPI) handleGetQueued(req *GetQueuedRequest) *QueuedResponse {
 	state := api.engine.GetState()
 
-	actionJSONs := make([]ActionJSON, len(api.actionQueue))
-	for i, action := range api.actionQueue {
-		actionJSONs[i] = SerializeAction(action, state)
+	var filteredActions []ActionJSON
+	for _, action := range api.actionQueue {
+		// If player_id is specified, only include actions from that player
+		if req.PlayerID != "" && action.PlayerID() != req.PlayerID {
+			continue
+		}
+		filteredActions = append(filteredActions, SerializeAction(action, state))
 	}
 
 	return &QueuedResponse{
 		Success: true,
 		Phase:   state.Phase.String(),
-		Actions: actionJSONs,
+		Actions: filteredActions,
 	}
 }
 

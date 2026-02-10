@@ -19,6 +19,7 @@ const phaseInfo = document.getElementById('phase-info');
 const countriesDisplay = document.getElementById('countries-display');
 const merchantsDisplay = document.getElementById('merchants-display');
 const actionsList = document.getElementById('actions-list');
+const queuedActionsList = document.getElementById('queued-actions-list');
 const adminPanel = document.getElementById('admin-panel');
 const consoleOutput = document.getElementById('console-output');
 const consoleInput = document.getElementById('console-input');
@@ -124,10 +125,12 @@ function connect() {
         log('Connected to server', 'received');
         refreshState();
         refreshActions();
+        refreshQueuedActions();
 
         refreshInterval = setInterval(() => {
             refreshState();
             refreshActions();
+            refreshQueuedActions();
         }, 5000);
     };
 
@@ -156,7 +159,12 @@ function connect() {
         }
 
         if (data.actions !== undefined) {
-            renderActions(data.actions);
+            // Check if this is a queued actions response (has phase but no player_id)
+            if (data.phase !== undefined && data.player_id === undefined && data.state === undefined) {
+                renderQueuedActions(data.actions);
+            } else {
+                renderActions(data.actions);
+            }
         }
 
         // After receiving response to a user action, request fresh state
@@ -164,6 +172,7 @@ function connect() {
             pendingUserActions--;
             refreshState();
             refreshActions();
+            refreshQueuedActions();
         }
     };
 
@@ -233,6 +242,16 @@ function refreshActions() {
     }
 }
 
+function refreshQueuedActions() {
+    if (currentUser === 'admin') {
+        // Admin sees all queued actions
+        send({ type: 'get_queued' });
+    } else if (currentUser) {
+        // Players see only their queued actions
+        send({ type: 'get_queued', player_id: currentUser });
+    }
+}
+
 function logout() {
     if (ws) {
         ws.close();
@@ -261,6 +280,7 @@ function logout() {
     countriesDisplay.innerHTML = '';
     merchantsDisplay.innerHTML = '';
     actionsList.innerHTML = '';
+    queuedActionsList.innerHTML = '';
     consoleOutput.innerHTML = '';
 }
 
@@ -501,6 +521,42 @@ function renderActions(actions) {
             });
             actionsList.appendChild(btn);
         }
+    });
+}
+
+function renderQueuedActions(actions) {
+    queuedActionsList.innerHTML = '';
+
+    if (!actions || actions.length === 0) {
+        const empty = document.createElement('div');
+        empty.textContent = 'No queued actions';
+        empty.style.color = '#666';
+        empty.style.fontSize = '0.9em';
+        queuedActionsList.appendChild(empty);
+        return;
+    }
+
+    actions.forEach(action => {
+        const item = document.createElement('div');
+        item.className = 'queued-action-item';
+        item.style.padding = '8px';
+        item.style.marginBottom = '4px';
+        item.style.backgroundColor = '#2a2a2a';
+        item.style.borderRadius = '4px';
+        item.style.fontSize = '0.9em';
+
+        const playerLabel = document.createElement('span');
+        playerLabel.style.color = '#4ecdc4';
+        playerLabel.style.fontWeight = 'bold';
+        playerLabel.textContent = action.player_id + ': ';
+
+        const actionText = document.createElement('span');
+        actionText.style.color = '#e0e0e0';
+        actionText.textContent = formatAction(action);
+
+        item.appendChild(playerLabel);
+        item.appendChild(actionText);
+        queuedActionsList.appendChild(item);
     });
 }
 

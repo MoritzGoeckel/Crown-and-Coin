@@ -48,6 +48,12 @@ type GetActionsRequest struct {
 	PlayerID string      `json:"player_id"`
 }
 
+// GetQueuedRequest requests queued actions (optionally filtered by player)
+type GetQueuedRequest struct {
+	Type     RequestType `json:"type"`
+	PlayerID string      `json:"player_id,omitempty"` // Optional: if empty, returns all actions
+}
+
 // SubmitRequest submits actions for the current phase
 type SubmitRequest struct {
 	Type    RequestType  `json:"type"`
@@ -225,7 +231,11 @@ func ParseRequest(data []byte) (RequestType, interface{}, error) {
 		return base.Type, &req, nil
 
 	case RequestGetQueued:
-		return base.Type, &base, nil
+		var req GetQueuedRequest
+		if err := json.Unmarshal(data, &req); err != nil {
+			return base.Type, nil, err
+		}
+		return base.Type, &req, nil
 
 	case RequestAdvance:
 		return base.Type, &base, nil
