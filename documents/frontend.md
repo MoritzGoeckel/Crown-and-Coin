@@ -62,6 +62,9 @@ The websocket messages follow that patter:
 - [ ] Reject contradicting actions
 - [ ] Clear pending actions
 
+- [ ] Monarchs start with 10 gold
+- [ ] Merchants should start with 5 and get another 5 every round
+
 # frontend
 - [ ] New game
 

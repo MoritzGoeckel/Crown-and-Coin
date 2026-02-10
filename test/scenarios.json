@@ -642,7 +642,7 @@
           ]
         },
         "expected": {
-          "success": true,
+          "success": false,
           "queued_actions": 1,
           "phase": "spending",
           "rejected_actions": [
@@ -711,7 +711,7 @@
           ]
         },
         "expected": {
-          "success": true,
+          "success": false,
           "queued_actions": 1,
           "phase": "war",
           "rejected_actions": [
@@ -765,7 +765,7 @@
           ]
         },
         "expected": {
-          "success": true,
+          "success": false,
           "queued_actions": 1,
           "phase": "assessment",
           "rejected_actions": [

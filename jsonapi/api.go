@@ -269,7 +269,7 @@ func (api *GameAPI) handleSubmit(req *SubmitRequest) *SubmitResponse {
 	}
 
 	response := &SubmitResponse{
-		Success:       true,
+		Success:       len(rejectedActions) == 0, // Only success if no actions were rejected
 		QueuedActions: len(api.engine.GetPendingActions()),
 		Phase:         state.Phase.String(),
 	}
