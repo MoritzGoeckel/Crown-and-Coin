@@ -61,11 +61,12 @@ The websocket messages follow that patter:
 - [ ] History of actions should be shown
 
 # engine
-- [/] Queue multiple actions
-- [/] Reject contradicting actions
+- [x] Queue multiple actions
+- [x] Reject contradicting actions
 - [/] Invest <AMOUNT:0-5> shown
+- [ ] Can't put money for investing as merchant
 - [ ] Clear pending actions
-- [ ] Fix high and low taxation at the same time
+- [/] Fix high and low taxation at the same time
 - [ ] Monarch can't tax merchants but should
 
 - [ ] Monarchs start with 10 gold
