@@ -47,4 +47,6 @@ The websocket messages follow that patter:
 
 - [x] Separate registration and login
 
-- [ ] Invest amount changes on update
+- [x] Invest amount changes on update
+
+- [ ] Attack action missing

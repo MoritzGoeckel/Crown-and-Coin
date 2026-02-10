@@ -496,7 +496,21 @@ function parseAmountRange(value) {
     return null;
 }
 
+function getActionKey(action) {
+    // Create a unique identifier for this action to preserve input values
+    return `${action.type}_${action.player_id || ''}_${action.merchant_id || ''}_${action.country_id || ''}`;
+}
+
 function renderActions(actions) {
+    // Save current input values before clearing
+    const savedValues = {};
+    actionsList.querySelectorAll('.amount-input').forEach(input => {
+        const key = input.dataset.actionKey;
+        if (key) {
+            savedValues[key] = input.value;
+        }
+    });
+
     actionsList.innerHTML = '';
 
     if (!actions || actions.length === 0) {
@@ -522,8 +536,24 @@ function renderActions(actions) {
             input.type = 'number';
             input.min = range.min;
             input.max = range.max;
-            input.value = range.max > 0 ? range.max : range.min;
             input.className = 'amount-input';
+
+            // Generate action key and store it on the input
+            const actionKey = getActionKey(action);
+            input.dataset.actionKey = actionKey;
+
+            // Restore saved value if it exists and is valid, otherwise use max
+            const savedValue = savedValues[actionKey];
+            if (savedValue !== undefined) {
+                const numValue = parseInt(savedValue);
+                if (!isNaN(numValue) && numValue >= range.min && numValue <= range.max) {
+                    input.value = numValue;
+                } else {
+                    input.value = range.max > 0 ? range.max : range.min;
+                }
+            } else {
+                input.value = range.max > 0 ? range.max : range.min;
+            }
 
             const btn = document.createElement('button');
             btn.textContent = 'Go';

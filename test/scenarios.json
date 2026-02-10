@@ -248,6 +248,27 @@
         }
       },
       {
+        "request": {"type": "get_actions", "player_id": "alice"},
+        "expected": {
+          "success": true,
+          "player_id": "alice",
+          "phase": "war",
+          "actions": [
+            {
+              "country_id": "Avalon",
+              "player_id": "alice",
+              "type": "no_attack"
+            },
+            {
+              "country_id": "Avalon",
+              "player_id": "alice",
+              "target_id": "Britannia",
+              "type": "attack"
+            }
+          ]
+        }
+      },
+      {
         "request": {
           "type": "submit",
           "actions": [
