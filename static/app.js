@@ -24,18 +24,11 @@ const merchantsDisplay = document.getElementById('merchants-display');
 const actionsList = document.getElementById('actions-list');
 const queuedActionsList = document.getElementById('queued-actions-list');
 const adminPanel = document.getElementById('admin-panel');
-const consoleOutput = document.getElementById('console-output');
-const consoleInput = document.getElementById('console-input');
-const sendBtn = document.getElementById('send-btn');
 const logoutBtn = document.getElementById('logout-btn');
 
 loginBtn.addEventListener('click', login);
 signupBtn.addEventListener('click', signup);
-sendBtn.addEventListener('click', sendConsoleMessage);
 logoutBtn.addEventListener('click', logout);
-consoleInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') sendConsoleMessage();
-});
 loginUsernameInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') login();
 });
@@ -139,9 +132,9 @@ function connectToServer(name, secret) {
 
         if (currentUser === 'admin') {
             adminPanel.classList.remove('hidden');
-            document.getElementById('game-content').style.gridTemplateColumns = '1fr 1fr 1fr 1fr';
-        } else {
             document.getElementById('game-content').style.gridTemplateColumns = '1fr 1fr 1fr';
+        } else {
+            document.getElementById('game-content').style.gridTemplateColumns = '1fr 1fr';
         }
 
         log('Connected to server', 'received');
@@ -228,30 +221,14 @@ function send(payload) {
 
     // Track non-refresh messages so we can auto-refresh after response
     const type = payload.type;
-    if (type !== 'get_state' && type !== 'get_actions' && type !== 'get_connected_players') {
+    if (type !== 'get_state' && type !== 'get_actions' && type !== 'get_queued' && type !== 'get_connected_players') {
         pendingUserActions++;
     }
 }
 
-function sendConsoleMessage() {
-    const input = consoleInput.value.trim();
-    if (!input) return;
-
-    try {
-        const payload = JSON.parse(input);
-        send(payload);
-        consoleInput.value = '';
-    } catch (err) {
-        log('Invalid JSON: ' + err.message, 'error');
-    }
-}
-
 function log(message, type = 'received') {
-    const entry = document.createElement('div');
-    entry.className = `log-entry ${type}`;
-    entry.textContent = message;
-    consoleOutput.appendChild(entry);
-    consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    const prefix = type === 'sent' ? '→' : type === 'error' ? '✗' : '←';
+    console.log(`${prefix} ${message}`);
 }
 
 function refreshState() {
@@ -307,7 +284,6 @@ function logout() {
     merchantsDisplay.innerHTML = '';
     actionsList.innerHTML = '';
     queuedActionsList.innerHTML = '';
-    consoleOutput.innerHTML = '';
 }
 
 function renderState(state) {
