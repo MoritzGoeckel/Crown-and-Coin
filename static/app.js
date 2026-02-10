@@ -22,6 +22,7 @@ const countriesDisplay = document.getElementById('countries-display');
 const merchantsDisplay = document.getElementById('merchants-display');
 const actionsList = document.getElementById('actions-list');
 const queuedActionsList = document.getElementById('queued-actions-list');
+const rejectedActionsList = document.getElementById('rejected-actions-list');
 const adminPanel = document.getElementById('admin-panel');
 const logoutBtn = document.getElementById('logout-btn');
 
@@ -196,6 +197,14 @@ function connectToServer(name, secret) {
             } else {
                 renderActions(data.actions);
             }
+        }
+
+        // Handle rejected actions from submit responses
+        if (data.rejected_actions && data.rejected_actions.length > 0) {
+            renderRejectedActions(data.rejected_actions);
+        } else if (data.queued_actions !== undefined) {
+            // Clear rejected actions on successful submit
+            renderRejectedActions([]);
         }
     };
 
@@ -608,6 +617,45 @@ function renderQueuedActions(actions) {
         item.appendChild(playerLabel);
         item.appendChild(actionText);
         queuedActionsList.appendChild(item);
+    });
+}
+
+function renderRejectedActions(rejectedActions) {
+    if (!rejectedActionsList) return; // Element might not exist in older HTML
+
+    const container = document.getElementById('rejected-actions-container');
+    rejectedActionsList.innerHTML = '';
+
+    if (!rejectedActions || rejectedActions.length === 0) {
+        if (container) container.style.display = 'none';
+        return;
+    }
+
+    if (container) container.style.display = 'block';
+
+    rejectedActions.forEach(rejected => {
+        const item = document.createElement('div');
+        item.className = 'rejected-action-item';
+        item.style.padding = '10px';
+        item.style.marginBottom = '8px';
+        item.style.backgroundColor = '#3a2020';
+        item.style.borderLeft = '3px solid #ff4444';
+        item.style.borderRadius = '4px';
+        item.style.fontSize = '0.9em';
+
+        const actionText = document.createElement('div');
+        actionText.style.color = '#e0e0e0';
+        actionText.style.marginBottom = '4px';
+        actionText.textContent = formatAction(rejected.action);
+
+        const reasonText = document.createElement('div');
+        reasonText.style.color = '#ff6666';
+        reasonText.style.fontSize = '0.85em';
+        reasonText.textContent = '⚠ ' + rejected.reason;
+
+        item.appendChild(actionText);
+        item.appendChild(reasonText);
+        rejectedActionsList.appendChild(item);
     });
 }
 
