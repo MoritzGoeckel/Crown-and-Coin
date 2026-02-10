@@ -45,6 +45,6 @@ The websocket messages follow that patter:
 
 - [ ] There needs to be feedback in the interface which action the player logged in. Maybe we need to change engine to ask for chosen action, have that in the game state
 
-- [ ] Separate registration and login
+- [x] Separate registration and login
 
 - [ ] Invest amount changes on update

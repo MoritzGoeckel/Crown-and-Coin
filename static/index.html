@@ -10,13 +10,30 @@
     <div id="app">
         <div id="login-screen" class="screen">
             <h1>Crown & Coin</h1>
-            <div class="form">
-                <input type="text" id="username" placeholder="Username">
-                <input type="password" id="secret" placeholder="Secret">
-                <button id="register-btn">Register</button>
-                <button id="connect-btn">Connect</button>
+
+            <div class="auth-container">
+                <div class="auth-pane">
+                    <h2>Login</h2>
+                    <div class="form">
+                        <input type="text" id="login-username" placeholder="Username">
+                        <input type="password" id="login-secret" placeholder="Secret">
+                        <button id="login-btn">Login</button>
+                    </div>
+                    <p id="login-error" class="error"></p>
+                </div>
+
+                <div class="auth-divider"></div>
+
+                <div class="auth-pane">
+                    <h2>Sign Up</h2>
+                    <div class="form">
+                        <input type="text" id="signup-username" placeholder="Username">
+                        <input type="password" id="signup-secret" placeholder="Secret">
+                        <button id="signup-btn">Sign Up</button>
+                    </div>
+                    <p id="signup-error" class="error"></p>
+                </div>
             </div>
-            <p id="login-error" class="error"></p>
         </div>
 
         <div id="game-screen" class="screen hidden">

@@ -9,11 +9,14 @@ let pendingUserActions = 0;
 
 const loginScreen = document.getElementById('login-screen');
 const gameScreen = document.getElementById('game-screen');
-const usernameInput = document.getElementById('username');
-const secretInput = document.getElementById('secret');
-const registerBtn = document.getElementById('register-btn');
-const connectBtn = document.getElementById('connect-btn');
+const loginUsernameInput = document.getElementById('login-username');
+const loginSecretInput = document.getElementById('login-secret');
+const signupUsernameInput = document.getElementById('signup-username');
+const signupSecretInput = document.getElementById('signup-secret');
+const loginBtn = document.getElementById('login-btn');
+const signupBtn = document.getElementById('signup-btn');
 const loginError = document.getElementById('login-error');
+const signupError = document.getElementById('signup-error');
 const userInfo = document.getElementById('user-info');
 const phaseInfo = document.getElementById('phase-info');
 const countriesDisplay = document.getElementById('countries-display');
@@ -26,12 +29,24 @@ const consoleInput = document.getElementById('console-input');
 const sendBtn = document.getElementById('send-btn');
 const logoutBtn = document.getElementById('logout-btn');
 
-registerBtn.addEventListener('click', register);
-connectBtn.addEventListener('click', connect);
+loginBtn.addEventListener('click', login);
+signupBtn.addEventListener('click', signup);
 sendBtn.addEventListener('click', sendConsoleMessage);
 logoutBtn.addEventListener('click', logout);
 consoleInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendConsoleMessage();
+});
+loginUsernameInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') login();
+});
+loginSecretInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') login();
+});
+signupUsernameInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') signup();
+});
+signupSecretInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') signup();
 });
 
 document.getElementById('advance-btn').addEventListener('click', () => {
@@ -64,12 +79,13 @@ document.getElementById('remove-player-btn').addEventListener('click', () => {
     }
 });
 
-async function register() {
-    const name = usernameInput.value.trim();
-    const secret = secretInput.value.trim();
+async function signup() {
+    const name = signupUsernameInput.value.trim();
+    const secret = signupSecretInput.value.trim();
 
     if (!name || !secret) {
-        loginError.textContent = 'Please enter username and secret';
+        signupError.textContent = 'Please enter username and secret';
+        signupError.style.color = '#ff6b6b';
         return;
     }
 
@@ -81,29 +97,35 @@ async function register() {
         });
 
         if (response.ok) {
-            loginError.textContent = '';
-            loginError.style.color = '#4ecdc4';
-            loginError.textContent = 'Registration successful! Click Connect.';
+            signupError.textContent = '';
+            // Auto-login after successful registration
+            connectToServer(name, secret);
         } else {
             const text = await response.text();
-            loginError.style.color = '#ff6b6b';
-            loginError.textContent = text;
+            signupError.style.color = '#ff6b6b';
+            signupError.textContent = text;
         }
     } catch (err) {
-        loginError.style.color = '#ff6b6b';
-        loginError.textContent = 'Connection error';
+        signupError.style.color = '#ff6b6b';
+        signupError.textContent = 'Connection error';
     }
 }
 
-function connect() {
-    const name = usernameInput.value.trim();
-    const secret = secretInput.value.trim();
+function login() {
+    const name = loginUsernameInput.value.trim();
+    const secret = loginSecretInput.value.trim();
 
     if (!name || !secret) {
         loginError.textContent = 'Please enter username and secret';
+        loginError.style.color = '#ff6b6b';
         return;
     }
 
+    loginError.textContent = '';
+    connectToServer(name, secret);
+}
+
+function connectToServer(name, secret) {
     currentUser = name;
     currentSecret = secret;
 
@@ -272,10 +294,14 @@ function logout() {
     adminPanel.classList.add('hidden');
     loginScreen.classList.remove('hidden');
 
-    usernameInput.value = '';
-    secretInput.value = '';
+    loginUsernameInput.value = '';
+    loginSecretInput.value = '';
+    signupUsernameInput.value = '';
+    signupSecretInput.value = '';
     loginError.textContent = '';
     loginError.style.color = '#ff6b6b';
+    signupError.textContent = '';
+    signupError.style.color = '#ff6b6b';
 
     countriesDisplay.innerHTML = '';
     merchantsDisplay.innerHTML = '';
