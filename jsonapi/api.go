@@ -225,26 +225,235 @@ func (api *GameAPI) handleGetActions(req *GetActionsRequest) *ActionsResponse {
 
 func (api *GameAPI) handleSubmit(req *SubmitRequest) *SubmitResponse {
 	state := api.engine.GetState()
+	var rejectedActions []RejectedAction
+
+	// Get existing pending actions for validation
+	pendingActions := make([]actions.Action, 0)
+	for _, act := range api.engine.GetPendingActions() {
+		if action, ok := act.(actions.Action); ok {
+			pendingActions = append(pendingActions, action)
+		}
+	}
 
 	for _, aj := range req.Actions {
 		action, err := DeserializeAction(aj)
 		if err != nil {
-			continue // Skip invalid actions
+			rejectedActions = append(rejectedActions, RejectedAction{
+				Action: aj,
+				Reason: fmt.Sprintf("invalid action: %v", err),
+			})
+			continue
 		}
 
 		// Validate against current state
 		if err := action.Validate(state); err != nil {
-			continue // Skip actions that fail validation
+			rejectedActions = append(rejectedActions, RejectedAction{
+				Action: aj,
+				Reason: fmt.Sprintf("validation failed: %v", err),
+			})
+			continue
 		}
 
+		// Validate against pending actions
+		if reason := api.validateAgainstPending(action, pendingActions, state); reason != "" {
+			rejectedActions = append(rejectedActions, RejectedAction{
+				Action: aj,
+				Reason: reason,
+			})
+			continue
+		}
+
+		// Action is valid, add to pending and to local list for subsequent validation
 		api.engine.SubmitAction(action)
+		pendingActions = append(pendingActions, action)
 	}
 
-	return &SubmitResponse{
+	response := &SubmitResponse{
 		Success:       true,
 		QueuedActions: len(api.engine.GetPendingActions()),
 		Phase:         state.Phase.String(),
 	}
+
+	if len(rejectedActions) > 0 {
+		response.RejectedActions = rejectedActions
+	}
+
+	return response
+}
+
+// validateAgainstPending checks if an action conflicts with already pending actions
+func (api *GameAPI) validateAgainstPending(action actions.Action, pendingActions []actions.Action, state *engine.GameState) string {
+	playerID := action.PlayerID()
+
+	// Filter pending actions to only those from the same player
+	playerPending := make([]actions.Action, 0)
+	for _, pa := range pendingActions {
+		if pa.PlayerID() == playerID {
+			playerPending = append(playerPending, pa)
+		}
+	}
+
+	switch a := action.(type) {
+	case *actions.BuildArmyAction:
+		return api.validateGoldSpending(a.CountryID, a.Amount, playerPending, state)
+
+	case *actions.MonarchInvestAction:
+		return api.validateGoldSpending(a.CountryID, a.Amount, playerPending, state)
+
+	case *actions.TaxMerchantsAction:
+		return api.validateMerchantTaxation(a.MerchantID, a.Amount, playerPending, state)
+
+	case *actions.MerchantInvestAction:
+		return api.validateMerchantGoldSpending(a.MerchantID, a.Amount, playerPending, state)
+
+	case *actions.AttackAction:
+		return api.validateWarAction(a.AttackerID, true, a.DefenderID, playerPending)
+
+	case *actions.NoAttackAction:
+		return api.validateWarAction(a.CountryID, false, "", playerPending)
+
+	case *actions.RemainAction, *actions.FleeAction, *actions.RevoltAction:
+		return api.validateMerchantAssessment(action, playerPending)
+	}
+
+	return ""
+}
+
+// validateGoldSpending checks if a country has enough gold for the action
+func (api *GameAPI) validateGoldSpending(countryID string, amount int, pending []actions.Action, state *engine.GameState) string {
+	country := state.GetCountry(countryID)
+	if country == nil {
+		return "country not found"
+	}
+
+	totalSpent := amount
+	for _, pa := range pending {
+		switch a := pa.(type) {
+		case *actions.BuildArmyAction:
+			if a.CountryID == countryID {
+				totalSpent += a.Amount
+			}
+		case *actions.MonarchInvestAction:
+			if a.CountryID == countryID {
+				totalSpent += a.Amount
+			}
+		}
+	}
+
+	if totalSpent > country.Gold {
+		return fmt.Sprintf("insufficient gold: trying to spend %d but only have %d (including pending actions)", totalSpent, country.Gold)
+	}
+
+	return ""
+}
+
+// validateMerchantTaxation checks if a merchant is being over-taxed
+func (api *GameAPI) validateMerchantTaxation(merchantID string, amount int, pending []actions.Action, state *engine.GameState) string {
+	merchant := state.GetMerchant(merchantID)
+	if merchant == nil {
+		return "merchant not found"
+	}
+
+	totalTaxed := amount
+	for _, pa := range pending {
+		if a, ok := pa.(*actions.TaxMerchantsAction); ok {
+			if a.MerchantID == merchantID {
+				totalTaxed += a.Amount
+			}
+		}
+	}
+
+	if totalTaxed > merchant.StoredGold {
+		return fmt.Sprintf("merchant has insufficient gold: trying to tax %d but merchant only has %d (including pending taxes)", totalTaxed, merchant.StoredGold)
+	}
+
+	return ""
+}
+
+// validateMerchantGoldSpending checks if a merchant has enough gold
+func (api *GameAPI) validateMerchantGoldSpending(merchantID string, amount int, pending []actions.Action, state *engine.GameState) string {
+	merchant := state.GetMerchant(merchantID)
+	if merchant == nil {
+		return "merchant not found"
+	}
+
+	totalSpent := amount
+	totalTaxed := 0
+
+	for _, pa := range pending {
+		switch a := pa.(type) {
+		case *actions.MerchantInvestAction:
+			if a.MerchantID == merchantID {
+				totalSpent += a.Amount
+			}
+		case *actions.TaxMerchantsAction:
+			if a.MerchantID == merchantID {
+				totalTaxed += a.Amount
+			}
+		}
+	}
+
+	available := merchant.StoredGold - totalTaxed
+	if totalSpent > available {
+		return fmt.Sprintf("merchant has insufficient gold: trying to invest %d but only have %d after pending taxes", totalSpent, available)
+	}
+
+	return ""
+}
+
+// validateWarAction checks if a country already has a war action pending
+func (api *GameAPI) validateWarAction(countryID string, isAttack bool, targetID string, pending []actions.Action) string {
+	for _, pa := range pending {
+		switch a := pa.(type) {
+		case *actions.AttackAction:
+			if a.AttackerID == countryID {
+				if isAttack && a.DefenderID == targetID {
+					return "already have this attack action pending"
+				}
+				return "already have an attack action pending, cannot submit another war action"
+			}
+		case *actions.NoAttackAction:
+			if a.CountryID == countryID {
+				return "already have a no-attack action pending, cannot submit another war action"
+			}
+		}
+	}
+
+	return ""
+}
+
+// validateMerchantAssessment checks if a merchant already has an assessment action pending
+func (api *GameAPI) validateMerchantAssessment(action actions.Action, pending []actions.Action) string {
+	var merchantID string
+
+	switch a := action.(type) {
+	case *actions.RemainAction:
+		merchantID = a.MerchantID
+	case *actions.FleeAction:
+		merchantID = a.MerchantID
+	case *actions.RevoltAction:
+		merchantID = a.MerchantID
+	default:
+		return ""
+	}
+
+	for _, pa := range pending {
+		var pendingMerchantID string
+		switch a := pa.(type) {
+		case *actions.RemainAction:
+			pendingMerchantID = a.MerchantID
+		case *actions.FleeAction:
+			pendingMerchantID = a.MerchantID
+		case *actions.RevoltAction:
+			pendingMerchantID = a.MerchantID
+		}
+
+		if pendingMerchantID == merchantID {
+			return "merchant already has an assessment action pending"
+		}
+	}
+
+	return ""
 }
 
 func (api *GameAPI) handleGetQueued(req *GetQueuedRequest) *QueuedResponse {

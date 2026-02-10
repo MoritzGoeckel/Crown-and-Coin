@@ -382,7 +382,7 @@
           "actions": [
             {"type": "tax_peasants_low", "player_id": "alice", "country_id": "Avalon"},
             {"type": "tax_peasants_low", "player_id": "bob", "country_id": "Britannia"},
-            {"type": "tax_merchants", "player_id": "alice", "country_id": "Avalon", "merchant_id": "charlie", "amount": 3}
+            {"type": "tax_merchants", "player_id": "alice", "country_id": "Avalon", "merchant_id": "charlie", "amount": 2}
           ]
         },
         "expected": {"success": true, "queued_actions": 3, "phase": "taxation"}
@@ -398,11 +398,11 @@
             "turn": 2,
             "phase": "negotiation",
             "countries": {
-              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 4, "gold": 15, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 4, "gold": 14, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
               "Britannia": {"country_id": "Britannia", "hp": 5, "army_strength": 1, "gold": 7, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
             },
             "merchants": {
-              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 0},
+              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 11, "invested_gold": 0},
               "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 0},
               "diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 6, "invested_gold": 0},
               "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 12, "invested_gold": 0}
@@ -421,11 +421,11 @@
             "turn": 2,
             "phase": "spending",
             "countries": {
-              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 4, "gold": 15, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 4, "gold": 14, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
               "Britannia": {"country_id": "Britannia", "hp": 5, "army_strength": 1, "gold": 7, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
             },
             "merchants": {
-              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 0},
+              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 11, "invested_gold": 0},
               "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 0},
               "diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 6, "invested_gold": 0},
               "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 12, "invested_gold": 0}
@@ -458,11 +458,11 @@
             "turn": 2,
             "phase": "war",
             "countries": {
-              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 16, "gold": 3, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 16, "gold": 2, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
               "Britannia": {"country_id": "Britannia", "hp": 5, "army_strength": 8, "gold": 0, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
             },
             "merchants": {
-              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
+              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 6, "invested_gold": 5},
               "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
               "diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 3, "invested_gold": 3},
               "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 6, "invested_gold": 6}
@@ -490,11 +490,11 @@
             "turn": 2,
             "phase": "assessment",
             "countries": {
-              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 8, "gold": 8, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 8, "gold": 7, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
               "Britannia": {"country_id": "Britannia", "hp": 1, "army_strength": 4, "gold": 0, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": true}
             },
             "merchants": {
-              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
+              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 6, "invested_gold": 5},
               "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
               "diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 3, "invested_gold": 3},
               "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 6, "invested_gold": 6}
@@ -525,11 +525,11 @@
             "turn": 3,
             "phase": "taxation",
             "countries": {
-              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 8, "gold": 8, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 8, "gold": 7, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
               "Britannia": {"country_id": "Britannia", "hp": -1, "army_strength": 4, "gold": 0, "peasants": 1, "is_republic": true, "monarch_id": "", "died_once": true}
             },
             "merchants": {
-              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
+              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 6, "invested_gold": 5},
               "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
               "diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 3, "invested_gold": 3},
               "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 6, "invested_gold": 6}
@@ -545,16 +545,235 @@
             "turn": 3,
             "phase": "taxation",
             "countries": {
-              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 8, "gold": 8, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 8, "gold": 7, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
               "Britannia": {"country_id": "Britannia", "hp": -1, "army_strength": 4, "gold": 0, "peasants": 1, "is_republic": true, "monarch_id": "", "died_once": true}
             },
             "merchants": {
-              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
+              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 6, "invested_gold": 5},
               "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
               "diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 3, "invested_gold": 3},
               "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 6, "invested_gold": 6}
             }
           }
+        }
+      }
+    ]
+  },
+  {
+    "name": "Action conflict validation tests",
+    "seed": 54321,
+    "steps": [
+      {
+        "request": {"type": "add_country", "country_id": "TestLand", "monarch_id": "monarch1"},
+        "expected": {"success": true}
+      },
+      {
+        "request": {"type": "add_merchant", "player_id": "merchant1", "country_id": "TestLand"},
+        "expected": {"success": true}
+      },
+      {
+        "comment": "Submit taxation to give country some gold (10 gold from high tax)",
+        "request": {
+          "type": "submit",
+          "actions": [
+            {"type": "tax_peasants_high", "player_id": "monarch1", "country_id": "TestLand"}
+          ]
+        },
+        "expected": {"success": true, "queued_actions": 1, "phase": "taxation"}
+      },
+      {
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "previous_phase": "taxation",
+          "current_phase": "negotiation",
+          "turn": 1,
+          "state": {
+            "turn": 1,
+            "phase": "negotiation",
+            "countries": {
+              "TestLand": {"country_id": "TestLand", "hp": 10, "army_strength": 0, "gold": 10, "peasants": 1, "is_republic": false, "monarch_id": "monarch1", "died_once": false}
+            },
+            "merchants": {
+              "merchant1": {"player_id": "merchant1", "country_id": "TestLand", "stored_gold": 5, "invested_gold": 0}
+            }
+          }
+        }
+      },
+      {
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "previous_phase": "negotiation",
+          "current_phase": "spending",
+          "turn": 1,
+          "state": {
+            "turn": 1,
+            "phase": "spending",
+            "countries": {
+              "TestLand": {"country_id": "TestLand", "hp": 10, "army_strength": 0, "gold": 10, "peasants": 1, "is_republic": false, "monarch_id": "monarch1", "died_once": false}
+            },
+            "merchants": {
+              "merchant1": {"player_id": "merchant1", "country_id": "TestLand", "stored_gold": 5, "invested_gold": 0}
+            }
+          }
+        }
+      },
+      {
+        "comment": "Submit valid build_army action for 5 gold",
+        "request": {
+          "type": "submit",
+          "actions": [
+            {"type": "build_army", "player_id": "monarch1", "country_id": "TestLand", "amount": 5}
+          ]
+        },
+        "expected": {
+          "success": true,
+          "queued_actions": 1,
+          "phase": "spending"
+        }
+      },
+      {
+        "comment": "Try to submit another build_army for 10 gold - should be rejected (only 10 total, 5 already pending)",
+        "request": {
+          "type": "submit",
+          "actions": [
+            {"type": "build_army", "player_id": "monarch1", "country_id": "TestLand", "amount": 10}
+          ]
+        },
+        "expected": {
+          "success": true,
+          "queued_actions": 1,
+          "phase": "spending",
+          "rejected_actions": [
+            {
+              "action": {"type": "build_army", "player_id": "monarch1", "country_id": "TestLand", "amount": 10},
+              "reason": "insufficient gold: trying to spend 15 but only have 10 (including pending actions)"
+            }
+          ]
+        }
+      },
+      {
+        "comment": "Verify only the first action is pending",
+        "request": {"type": "pending_actions", "player_id": "monarch1"},
+        "expected": {
+          "success": true,
+          "phase": "spending",
+          "actions": [
+            {"type": "build_army", "player_id": "monarch1", "country_id": "TestLand", "amount": 5}
+          ]
+        }
+      },
+      {
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "previous_phase": "spending",
+          "current_phase": "war",
+          "turn": 1,
+          "state": {
+            "turn": 1,
+            "phase": "war",
+            "countries": {
+              "TestLand": {"country_id": "TestLand", "hp": 10, "army_strength": 5, "gold": 5, "peasants": 1, "is_republic": false, "monarch_id": "monarch1", "died_once": false}
+            },
+            "merchants": {
+              "merchant1": {"player_id": "merchant1", "country_id": "TestLand", "stored_gold": 5, "invested_gold": 0}
+            }
+          }
+        }
+      },
+      {
+        "comment": "Add another country for war tests",
+        "request": {"type": "add_country", "country_id": "Enemy", "monarch_id": "enemy1"},
+        "expected": {"success": true}
+      },
+      {
+        "comment": "Submit attack action",
+        "request": {
+          "type": "submit",
+          "actions": [
+            {"type": "attack", "player_id": "monarch1", "country_id": "TestLand", "target_id": "Enemy"}
+          ]
+        },
+        "expected": {
+          "success": true,
+          "queued_actions": 1,
+          "phase": "war"
+        }
+      },
+      {
+        "comment": "Try to submit no_attack - should be rejected (already have attack pending)",
+        "request": {
+          "type": "submit",
+          "actions": [
+            {"type": "no_attack", "player_id": "monarch1", "country_id": "TestLand"}
+          ]
+        },
+        "expected": {
+          "success": true,
+          "queued_actions": 1,
+          "phase": "war",
+          "rejected_actions": [
+            {
+              "action": {"type": "no_attack", "player_id": "monarch1", "country_id": "TestLand"},
+              "reason": "already have an attack action pending, cannot submit another war action"
+            }
+          ]
+        }
+      },
+      {
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "previous_phase": "war",
+          "current_phase": "assessment",
+          "turn": 1,
+          "state": {
+            "turn": 1,
+            "phase": "assessment",
+            "countries": {
+              "TestLand": {"country_id": "TestLand", "hp": 10, "army_strength": 2, "gold": 10, "peasants": 1, "is_republic": false, "monarch_id": "monarch1", "died_once": false},
+              "Enemy": {"country_id": "Enemy", "hp": 5, "army_strength": 0, "gold": 0, "peasants": 1, "is_republic": false, "monarch_id": "enemy1", "died_once": false}
+            },
+            "merchants": {
+              "merchant1": {"player_id": "merchant1", "country_id": "TestLand", "stored_gold": 5, "invested_gold": 0}
+            }
+          }
+        }
+      },
+      {
+        "comment": "Submit remain action for merchant",
+        "request": {
+          "type": "submit",
+          "actions": [
+            {"type": "remain", "player_id": "merchant1", "merchant_id": "merchant1"}
+          ]
+        },
+        "expected": {
+          "success": true,
+          "queued_actions": 1,
+          "phase": "assessment"
+        }
+      },
+      {
+        "comment": "Try to submit flee action - should be rejected (already have remain pending)",
+        "request": {
+          "type": "submit",
+          "actions": [
+            {"type": "flee", "player_id": "merchant1", "merchant_id": "merchant1", "target_id": "Enemy"}
+          ]
+        },
+        "expected": {
+          "success": true,
+          "queued_actions": 1,
+          "phase": "assessment",
+          "rejected_actions": [
+            {
+              "action": {"type": "flee", "player_id": "merchant1", "merchant_id": "merchant1", "target_id": "Enemy"},
+              "reason": "merchant already has an assessment action pending"
+            }
+          ]
         }
       }
     ]

@@ -157,11 +157,18 @@ type ActionsResponse struct {
 	Actions  []ActionJSON `json:"actions"`
 }
 
+// RejectedAction describes an action that was rejected during submission
+type RejectedAction struct {
+	Action ActionJSON `json:"action"`
+	Reason string     `json:"reason"`
+}
+
 // SubmitResponse confirms actions were queued
 type SubmitResponse struct {
-	Success       bool   `json:"success"`
-	QueuedActions int    `json:"queued_actions"`
-	Phase         string `json:"phase"`
+	Success         bool             `json:"success"`
+	QueuedActions   int              `json:"queued_actions"`
+	Phase           string           `json:"phase"`
+	RejectedActions []RejectedAction `json:"rejected_actions,omitempty"`
 }
 
 // QueuedResponse returns currently queued actions
