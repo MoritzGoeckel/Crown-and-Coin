@@ -103,7 +103,7 @@ async function signup() {
     }
 }
 
-function login() {
+async function login() {
     const name = loginUsernameInput.value.trim();
     const secret = loginSecretInput.value.trim();
 
@@ -113,8 +113,25 @@ function login() {
         return;
     }
 
-    loginError.textContent = '';
-    connectToServer(name, secret);
+    try {
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, secret })
+        });
+
+        if (response.ok) {
+            loginError.textContent = '';
+            connectToServer(name, secret);
+        } else {
+            const text = await response.text();
+            loginError.style.color = '#ff6b6b';
+            loginError.textContent = text;
+        }
+    } catch (err) {
+        loginError.style.color = '#ff6b6b';
+        loginError.textContent = 'Connection error';
+    }
 }
 
 function connectToServer(name, secret) {
@@ -351,12 +368,30 @@ function updateAdminSelects() {
     const playerSelect = document.getElementById('remove-player-select');
     const prevPlayer = playerSelect.value;
     playerSelect.innerHTML = '';
+
+    // Add all active players (merchants and monarchs)
+    const activePlayers = new Set();
+
+    // Add merchants
     for (const merchantId of Object.keys(gameState.merchants || {})) {
-        const option = document.createElement('option');
-        option.value = merchantId;
-        option.textContent = merchantId;
-        playerSelect.appendChild(option);
+        activePlayers.add(merchantId);
     }
+
+    // Add monarchs
+    for (const country of Object.values(gameState.countries || {})) {
+        if (country.monarch_id && !country.is_republic) {
+            activePlayers.add(country.monarch_id);
+        }
+    }
+
+    // Populate dropdown with all active players
+    Array.from(activePlayers).sort().forEach(playerId => {
+        const option = document.createElement('option');
+        option.value = playerId;
+        option.textContent = playerId;
+        playerSelect.appendChild(option);
+    });
+
     if (prevPlayer) playerSelect.value = prevPlayer;
 
     updateMerchantSelect();

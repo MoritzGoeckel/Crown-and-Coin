@@ -53,8 +53,8 @@ The websocket messages follow that patter:
 
 
 # frontend
-- [ ] Login works even though you are not registered
-- [ ] Remove players does not work
+- [/] Login works even though you are not registered
+- [/] Remove players does not work
 
 # engine
 - [ ] Queue multiple actions
@@ -62,3 +62,5 @@ The websocket messages follow that patter:
 
 # frontend
 - [ ] New game
+
+Unique names for players?

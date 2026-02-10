@@ -308,6 +308,36 @@ func (s *Server) handleRegister(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]bool{"success": true})
 }
 
+func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req struct {
+		Name   string `json:"name"`
+		Secret string `json:"secret"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
+
+	if req.Name == "" || req.Secret == "" {
+		http.Error(w, "Name and secret required", http.StatusBadRequest)
+		return
+	}
+
+	if !s.authenticateUser(req.Name, req.Secret) {
+		http.Error(w, "Invalid username or secret", http.StatusUnauthorized)
+		return
+	}
+
+	log.Printf("User logged in: %s", req.Name)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]bool{"success": true})
+}
+
 func main() {
 	server := NewServer()
 
@@ -322,6 +352,7 @@ func main() {
 
 	// API endpoints
 	http.HandleFunc("/register", server.handleRegister)
+	http.HandleFunc("/login", server.handleLogin)
 	http.HandleFunc("/ws", server.handleWebSocket)
 
 	addr := ":8080"
