@@ -95,6 +95,64 @@
         "expected": {"success": true, "queued_actions": 2, "phase": "taxation"}
       },
       {
+        "request": {"type": "get_state"},
+        "expected": {
+          "state": {
+            "countries": {
+              "Avalon": {
+                "army_strength": 0,
+                "country_id": "Avalon",
+                "died_once": false,
+                "gold": 0,
+                "hp": 10,
+                "is_republic": false,
+                "monarch_id": "alice",
+                "peasants": 1
+              },
+              "Britannia": {
+                "army_strength": 0,
+                "country_id": "Britannia",
+                "died_once": false,
+                "gold": 0,
+                "hp": 10,
+                "is_republic": false,
+                "monarch_id": "bob",
+                "peasants": 1
+              }
+            },
+            "merchants": {
+              "charlie": {
+                "country_id": "Avalon",
+                "invested_gold": 0,
+                "player_id": "charlie",
+                "stored_gold": 0
+              },
+              "diana": {
+                "country_id": "Britannia",
+                "invested_gold": 0,
+                "player_id": "diana",
+                "stored_gold": 0
+              },
+              "eve": {
+                "country_id": "Avalon",
+                "invested_gold": 0,
+                "player_id": "eve",
+                "stored_gold": 0
+              },
+              "frank": {
+                "country_id": "Britannia",
+                "invested_gold": 0,
+                "player_id": "frank",
+                "stored_gold": 0
+              }
+            },
+            "phase": "taxation",
+            "turn": 1
+          },
+          "success": true
+        }
+      },
+      {
         "request": {"type": "advance"},
         "expected": {
           "success": true,

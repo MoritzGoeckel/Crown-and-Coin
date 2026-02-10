@@ -48,7 +48,7 @@ document.getElementById('add-country-btn').addEventListener('click', () => {
 });
 
 document.getElementById('add-merchant-btn').addEventListener('click', () => {
-    const merchantId = document.getElementById('new-merchant-id').value.trim();
+    const merchantId = document.getElementById('new-merchant-id').value;
     const countryId = document.getElementById('merchant-country-select').value;
     if (merchantId && countryId) {
         send({ type: 'add_merchant', player_id: merchantId, country_id: countryId });
@@ -140,6 +140,7 @@ function connect() {
             connectedPlayers = (data.players || []).sort();
             renderConnectedPlayers();
             updateMonarchSelect();
+            updateMerchantSelect();
             return;
         }
 
@@ -351,6 +352,8 @@ function updateAdminSelects() {
         playerSelect.appendChild(option);
     }
     if (prevPlayer) playerSelect.value = prevPlayer;
+
+    updateMerchantSelect();
 }
 
 function renderConnectedPlayers() {
@@ -383,6 +386,44 @@ function updateMonarchSelect() {
         option.value = name;
         option.textContent = name;
         select.appendChild(option);
+    });
+
+    if (prevValue) select.value = prevValue;
+}
+
+function updateMerchantSelect() {
+    const select = document.getElementById('new-merchant-id');
+    if (!select) return;
+
+    const prevValue = select.value;
+    select.innerHTML = '<option value="">Select Merchant...</option>';
+
+    // Get current monarchs
+    const monarchs = new Set();
+    if (gameState && gameState.countries) {
+        for (const country of Object.values(gameState.countries)) {
+            if (country.monarch_id && !country.is_republic) {
+                monarchs.add(country.monarch_id);
+            }
+        }
+    }
+
+    // Get existing merchants
+    const existingMerchants = new Set();
+    if (gameState && gameState.merchants) {
+        for (const merchant of Object.values(gameState.merchants)) {
+            existingMerchants.add(merchant.player_id);
+        }
+    }
+
+    // Filter available players
+    connectedPlayers.forEach(name => {
+        if (!monarchs.has(name) && !existingMerchants.has(name)) {
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            select.appendChild(option);
+        }
     });
 
     if (prevValue) select.value = prevValue;
