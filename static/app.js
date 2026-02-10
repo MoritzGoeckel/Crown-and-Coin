@@ -645,6 +645,8 @@ function formatAction(action) {
             return 'Hide Gold';
         case 'attack':
             return `Attack ${action.target_id}`;
+        case 'no_attack':
+            return 'No Attack';
         case 'remain':
             return 'Remain';
         case 'flee':
