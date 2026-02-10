@@ -775,6 +775,61 @@
             }
           ]
         }
+      },
+      {
+        "comment": "Test: Cannot submit both low and high peasant tax - advance to next taxation phase",
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "state": {
+            "phase": "taxation",
+            "turn": 2,
+            "countries": {
+              "TestLand": {"country_id": "TestLand", "monarch_id": "monarch1", "gold": 10, "army_strength": 2, "hp": 10, "peasants": 1, "is_republic": false, "died_once": false},
+              "Enemy": {"country_id": "Enemy", "monarch_id": "enemy1", "gold": 0, "army_strength": 0, "hp": 5, "peasants": 1, "is_republic": false, "died_once": false}
+            },
+            "merchants": {
+              "merchant1": {"player_id": "merchant1", "country_id": "TestLand", "stored_gold": 5, "invested_gold": 0}
+            }
+          },
+          "events": [],
+          "turn": 2,
+          "previous_phase": "assessment",
+          "current_phase": "taxation"
+        }
+      },
+      {
+        "request": {
+          "type": "submit",
+          "actions": [
+            {"type": "tax_peasants_low", "player_id": "monarch1", "country_id": "TestLand"}
+          ]
+        },
+        "expected": {
+          "success": true,
+          "queued_actions": 1,
+          "phase": "taxation"
+        }
+      },
+      {
+        "comment": "Try to submit high tax - should be rejected",
+        "request": {
+          "type": "submit",
+          "actions": [
+            {"type": "tax_peasants_high", "player_id": "monarch1", "country_id": "TestLand"}
+          ]
+        },
+        "expected": {
+          "success": false,
+          "queued_actions": 1,
+          "phase": "taxation",
+          "rejected_actions": [
+            {
+              "action": {"type": "tax_peasants_high", "player_id": "monarch1", "country_id": "TestLand"},
+              "reason": "country already has a peasant tax action pending (cannot tax peasants multiple times)"
+            }
+          ]
+        }
       }
     ]
   }

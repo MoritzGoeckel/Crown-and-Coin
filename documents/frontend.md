@@ -53,14 +53,20 @@ The websocket messages follow that patter:
 
 
 # frontend
-- [/] Login works even though you are not registered
+- [x] Login works even though you are not registered
 - [/] Remove players does not work
+- [ ] Refresh loggs out
+- [ ] Players are not always updated for admin
+- [ ] Write phase and turn
+- [ ] History of actions should be shown
 
 # engine
-- [ ] Queue multiple actions
-- [ ] Invest <AMOUNT:0-5> shown
-- [ ] Reject contradicting actions
+- [/] Queue multiple actions
+- [/] Reject contradicting actions
+- [/] Invest <AMOUNT:0-5> shown
 - [ ] Clear pending actions
+- [ ] Fix high and low taxation at the same time
+- [ ] Monarch can't tax merchants but should
 
 - [ ] Monarchs start with 10 gold
 - [ ] Merchants should start with 5 and get another 5 every round

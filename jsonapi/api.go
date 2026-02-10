@@ -294,6 +294,9 @@ func (api *GameAPI) validateAgainstPending(action actions.Action, pendingActions
 	}
 
 	switch a := action.(type) {
+	case *actions.TaxPeasantsAction:
+		return api.validatePeasantTaxation(a.CountryID, playerPending)
+
 	case *actions.BuildArmyAction:
 		return api.validateGoldSpending(a.CountryID, a.Amount, playerPending, state)
 
@@ -453,6 +456,18 @@ func (api *GameAPI) validateMerchantAssessment(action actions.Action, pending []
 		}
 	}
 
+	return ""
+}
+
+// validatePeasantTaxation checks if there's already a peasant tax action pending for the country
+func (api *GameAPI) validatePeasantTaxation(countryID string, pending []actions.Action) string {
+	for _, pa := range pending {
+		if a, ok := pa.(*actions.TaxPeasantsAction); ok {
+			if a.CountryID == countryID {
+				return "country already has a peasant tax action pending (cannot tax peasants multiple times)"
+			}
+		}
+	}
 	return ""
 }
 
