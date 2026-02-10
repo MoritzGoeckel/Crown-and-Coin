@@ -6,15 +6,16 @@ import "encoding/json"
 type RequestType string
 
 const (
-	RequestGetPlayers    RequestType = "get_players"
-	RequestAddMerchant   RequestType = "add_merchant"
-	RequestAddCountry    RequestType = "add_country"
-	RequestRemoveMerchant RequestType = "remove_merchant"
-	RequestGetState      RequestType = "get_state"
-	RequestGetActions    RequestType = "get_actions"
-	RequestSubmit        RequestType = "submit"
-	RequestGetQueued     RequestType = "get_queued"
-	RequestAdvance       RequestType = "advance"
+	RequestGetPlayers       RequestType = "get_players"
+	RequestAddMerchant      RequestType = "add_merchant"
+	RequestAddCountry       RequestType = "add_country"
+	RequestRemoveMerchant   RequestType = "remove_merchant"
+	RequestGetState         RequestType = "get_state"
+	RequestGetActions       RequestType = "get_actions"
+	RequestSubmit           RequestType = "submit"
+	RequestGetQueued        RequestType = "get_queued"
+	RequestPendingActions   RequestType = "pending_actions"
+	RequestAdvance          RequestType = "advance"
 )
 
 // Request is the base request structure - use Type to determine specific request
@@ -52,6 +53,12 @@ type GetActionsRequest struct {
 type GetQueuedRequest struct {
 	Type     RequestType `json:"type"`
 	PlayerID string      `json:"player_id,omitempty"` // Optional: if empty, returns all actions
+}
+
+// GetPendingActionsRequest requests pending actions (optionally filtered by player)
+type GetPendingActionsRequest struct {
+	Type     RequestType `json:"type"`
+	PlayerID string      `json:"player_id,omitempty"` // Optional: if empty, returns all actions (admin only)
 }
 
 // SubmitRequest submits actions for the current phase
@@ -164,6 +171,13 @@ type QueuedResponse struct {
 	Actions []ActionJSON `json:"actions"`
 }
 
+// PendingActionsResponse returns currently pending actions
+type PendingActionsResponse struct {
+	Success bool         `json:"success"`
+	Phase   string       `json:"phase"`
+	Actions []ActionJSON `json:"actions"`
+}
+
 // AdvanceResponse returns results of advancing to next phase
 type AdvanceResponse struct {
 	Success       bool        `json:"success"`
@@ -232,6 +246,13 @@ func ParseRequest(data []byte) (RequestType, interface{}, error) {
 
 	case RequestGetQueued:
 		var req GetQueuedRequest
+		if err := json.Unmarshal(data, &req); err != nil {
+			return base.Type, nil, err
+		}
+		return base.Type, &req, nil
+
+	case RequestPendingActions:
+		var req GetPendingActionsRequest
 		if err := json.Unmarshal(data, &req); err != nil {
 			return base.Type, nil, err
 		}

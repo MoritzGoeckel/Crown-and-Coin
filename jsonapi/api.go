@@ -12,10 +12,9 @@ import (
 
 // GameAPI provides a JSON message-based interface to the game engine
 type GameAPI struct {
-	engine      *engine.Engine
-	actionQueue []actions.Action
-	phases      map[engine.PhaseType]phases.Phase
-	dice        engine.DiceRoller
+	engine *engine.Engine
+	phases map[engine.PhaseType]phases.Phase
+	dice   engine.DiceRoller
 }
 
 // NewGameAPI creates a new JSON API wrapper
@@ -26,10 +25,9 @@ func NewGameAPI() *GameAPI {
 // NewGameAPIWithDice creates a new JSON API with a specific dice roller (for testing)
 func NewGameAPIWithDice(dice engine.DiceRoller) *GameAPI {
 	api := &GameAPI{
-		engine:      engine.NewEngine(dice),
-		actionQueue: make([]actions.Action, 0),
-		phases:      make(map[engine.PhaseType]phases.Phase),
-		dice:        dice,
+		engine: engine.NewEngine(dice),
+		phases: make(map[engine.PhaseType]phases.Phase),
+		dice:   dice,
 	}
 
 	// Register all phases
@@ -67,6 +65,8 @@ func (api *GameAPI) ProcessMessage(data []byte) ([]byte, error) {
 		response = api.handleSubmit(req.(*SubmitRequest))
 	case RequestGetQueued:
 		response = api.handleGetQueued(req.(*GetQueuedRequest))
+	case RequestPendingActions:
+		response = api.handleGetPendingActions(req.(*GetPendingActionsRequest))
 	case RequestAdvance:
 		response = api.handleAdvance()
 	default:
@@ -212,7 +212,7 @@ func (api *GameAPI) handleGetActions(req *GetActionsRequest) *ActionsResponse {
 	// Convert to JSON format
 	actionJSONs := make([]ActionJSON, len(validActions))
 	for i, action := range validActions {
-		actionJSONs[i] = SerializeAction(action, state)
+		actionJSONs[i] = SerializeAction(action, state, true) // Use placeholders for valid actions
 	}
 
 	return &ActionsResponse{
@@ -237,12 +237,12 @@ func (api *GameAPI) handleSubmit(req *SubmitRequest) *SubmitResponse {
 			continue // Skip actions that fail validation
 		}
 
-		api.actionQueue = append(api.actionQueue, action)
+		api.engine.SubmitAction(action)
 	}
 
 	return &SubmitResponse{
 		Success:       true,
-		QueuedActions: len(api.actionQueue),
+		QueuedActions: len(api.engine.GetPendingActions()),
 		Phase:         state.Phase.String(),
 	}
 }
@@ -251,15 +251,42 @@ func (api *GameAPI) handleGetQueued(req *GetQueuedRequest) *QueuedResponse {
 	state := api.engine.GetState()
 
 	var filteredActions []ActionJSON
-	for _, action := range api.actionQueue {
+	for _, act := range api.engine.GetPendingActions() {
+		action, ok := act.(actions.Action)
+		if !ok {
+			continue
+		}
 		// If player_id is specified, only include actions from that player
 		if req.PlayerID != "" && action.PlayerID() != req.PlayerID {
 			continue
 		}
-		filteredActions = append(filteredActions, SerializeAction(action, state))
+		filteredActions = append(filteredActions, SerializeAction(action, state, false)) // Use actual values for queued actions
 	}
 
 	return &QueuedResponse{
+		Success: true,
+		Phase:   state.Phase.String(),
+		Actions: filteredActions,
+	}
+}
+
+func (api *GameAPI) handleGetPendingActions(req *GetPendingActionsRequest) *PendingActionsResponse {
+	state := api.engine.GetState()
+
+	var filteredActions []ActionJSON
+	for _, act := range api.engine.GetPendingActions() {
+		action, ok := act.(actions.Action)
+		if !ok {
+			continue
+		}
+		// If player_id is specified, only include actions from that player
+		if req.PlayerID != "" && action.PlayerID() != req.PlayerID {
+			continue
+		}
+		filteredActions = append(filteredActions, SerializeAction(action, state, false)) // Use actual values for pending actions
+	}
+
+	return &PendingActionsResponse{
 		Success: true,
 		Phase:   state.Phase.String(),
 		Actions: filteredActions,
@@ -275,14 +302,22 @@ func (api *GameAPI) handleAdvance() *AdvanceResponse {
 	var allEvents []events.Event
 
 	if ok {
-		// Execute the phase with queued actions
-		newState, phaseEvents := phase.Execute(state, api.actionQueue)
+		// Convert pending actions from []interface{} to []actions.Action
+		pendingActions := make([]actions.Action, 0)
+		for _, act := range api.engine.GetPendingActions() {
+			if action, ok := act.(actions.Action); ok {
+				pendingActions = append(pendingActions, action)
+			}
+		}
+
+		// Execute the phase with pending actions from engine
+		newState, phaseEvents := phase.Execute(state, pendingActions)
 		api.engine.SetState(newState)
 		allEvents = phaseEvents
 	}
 
-	// Clear action queue for next phase
-	api.actionQueue = make([]actions.Action, 0)
+	// Clear pending actions for next phase
+	api.engine.ClearPendingActions()
 
 	// Advance to next phase
 	api.engine.GetState().NextPhase()

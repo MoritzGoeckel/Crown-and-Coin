@@ -50,7 +50,7 @@ func (a *AttackAction) Validate(state *engine.GameState) error {
 	return nil
 }
 
-func (a *AttackAction) Apply(state *engine.GameState, roller DiceRoller) (*engine.GameState, []events.Event) {
+func (a *AttackAction) Apply(state *engine.GameState, roller engine.DiceRoller) (*engine.GameState, []events.Event) {
 	newState := state.Clone()
 	attacker := newState.GetCountry(a.AttackerID)
 	defender := newState.GetCountry(a.DefenderID)
@@ -141,7 +141,7 @@ func (a *NoAttackAction) Validate(state *engine.GameState) error {
 	return nil
 }
 
-func (a *NoAttackAction) Apply(state *engine.GameState, roller DiceRoller) (*engine.GameState, []events.Event) {
+func (a *NoAttackAction) Apply(state *engine.GameState, roller engine.DiceRoller) (*engine.GameState, []events.Event) {
 	// No attack is a no-op
 	return state.Clone(), nil
 }

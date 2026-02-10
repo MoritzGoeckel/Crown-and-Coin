@@ -34,7 +34,7 @@ func (a *RemainAction) Validate(state *engine.GameState) error {
 	return nil
 }
 
-func (a *RemainAction) Apply(state *engine.GameState, roller DiceRoller) (*engine.GameState, []events.Event) {
+func (a *RemainAction) Apply(state *engine.GameState, roller engine.DiceRoller) (*engine.GameState, []events.Event) {
 	// Remaining is a no-op
 	return state.Clone(), nil
 }
@@ -75,7 +75,7 @@ func (a *FleeAction) Validate(state *engine.GameState) error {
 	return nil
 }
 
-func (a *FleeAction) Apply(state *engine.GameState, roller DiceRoller) (*engine.GameState, []events.Event) {
+func (a *FleeAction) Apply(state *engine.GameState, roller engine.DiceRoller) (*engine.GameState, []events.Event) {
 	newState := state.Clone()
 	merchant := newState.GetMerchant(a.MerchantID)
 	var evts []events.Event
@@ -132,7 +132,7 @@ func (a *RevoltAction) Validate(state *engine.GameState) error {
 	return nil
 }
 
-func (a *RevoltAction) Apply(state *engine.GameState, roller DiceRoller) (*engine.GameState, []events.Event) {
+func (a *RevoltAction) Apply(state *engine.GameState, roller engine.DiceRoller) (*engine.GameState, []events.Event) {
 	// Individual revolt action just marks intention
 	// The actual revolt resolution happens in the phase
 	return state.Clone(), nil

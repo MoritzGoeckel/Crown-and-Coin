@@ -59,6 +59,8 @@ The websocket messages follow that patter:
 # engine
 - [ ] Queue multiple actions
 - [ ] Invest <AMOUNT:0-5> shown
+- [ ] Reject contradicting actions
+- [ ] Clear pending actions
 
 # frontend
 - [ ] New game

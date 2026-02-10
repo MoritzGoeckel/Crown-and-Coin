@@ -39,7 +39,7 @@ func (a *TaxPeasantsAction) Validate(state *engine.GameState) error {
 	return nil
 }
 
-func (a *TaxPeasantsAction) Apply(state *engine.GameState, roller DiceRoller) (*engine.GameState, []events.Event) {
+func (a *TaxPeasantsAction) Apply(state *engine.GameState, roller engine.DiceRoller) (*engine.GameState, []events.Event) {
 	newState := state.Clone()
 	country := newState.GetCountry(a.CountryID)
 	var evts []events.Event
@@ -107,7 +107,7 @@ func (a *TaxMerchantsAction) Validate(state *engine.GameState) error {
 	return nil
 }
 
-func (a *TaxMerchantsAction) Apply(state *engine.GameState, roller DiceRoller) (*engine.GameState, []events.Event) {
+func (a *TaxMerchantsAction) Apply(state *engine.GameState, roller engine.DiceRoller) (*engine.GameState, []events.Event) {
 	newState := state.Clone()
 	country := newState.GetCountry(a.CountryID)
 	merchant := newState.GetMerchant(a.MerchantID)

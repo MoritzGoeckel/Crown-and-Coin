@@ -43,13 +43,7 @@ type Action interface {
 	Validate(state *engine.GameState) error
 
 	// Apply executes the action and returns the new state and any events
-	Apply(state *engine.GameState, roller DiceRoller) (*engine.GameState, []events.Event)
-}
-
-// DiceRoller interface for injectable randomness
-type DiceRoller interface {
-	// Roll returns a random number between 1 and sides (inclusive)
-	Roll(sides int) int
+	Apply(state *engine.GameState, roller engine.DiceRoller) (*engine.GameState, []events.Event)
 }
 
 // BaseAction provides common functionality for actions

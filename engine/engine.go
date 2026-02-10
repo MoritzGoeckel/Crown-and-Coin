@@ -29,19 +29,21 @@ type Phase interface {
 
 // Engine orchestrates the game loop
 type Engine struct {
-	state    *GameState
-	phases   map[PhaseType]Phase
-	dice     DiceRoller
-	eventBus *events.EventBus
+	state          *GameState
+	phases         map[PhaseType]Phase
+	dice           DiceRoller
+	eventBus       *events.EventBus
+	pendingActions []interface{}
 }
 
 // NewEngine creates a new game engine
 func NewEngine(dice DiceRoller) *Engine {
 	return &Engine{
-		state:    NewGameState(),
-		phases:   make(map[PhaseType]Phase),
-		dice:     dice,
-		eventBus: events.NewEventBus(),
+		state:          NewGameState(),
+		phases:         make(map[PhaseType]Phase),
+		dice:           dice,
+		eventBus:       events.NewEventBus(),
+		pendingActions: make([]interface{}, 0),
 	}
 }
 
@@ -157,4 +159,19 @@ func (e *Engine) GetWinner() *Country {
 		}
 	}
 	return nil
+}
+
+// SubmitAction adds an action to the pending actions queue
+func (e *Engine) SubmitAction(action interface{}) {
+	e.pendingActions = append(e.pendingActions, action)
+}
+
+// GetPendingActions returns all pending actions
+func (e *Engine) GetPendingActions() []interface{} {
+	return e.pendingActions
+}
+
+// ClearPendingActions removes all pending actions
+func (e *Engine) ClearPendingActions() {
+	e.pendingActions = make([]interface{}, 0)
 }

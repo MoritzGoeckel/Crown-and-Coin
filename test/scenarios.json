@@ -95,6 +95,37 @@
         "expected": {"success": true, "queued_actions": 2, "phase": "taxation"}
       },
       {
+        "request": {"type": "pending_actions"},
+        "expected": {
+          "success": true,
+          "phase": "taxation",
+          "actions": [
+            {"type": "tax_peasants_high", "player_id": "alice", "country_id": "Avalon"},
+            {"type": "tax_peasants_low", "player_id": "bob", "country_id": "Britannia"}
+          ]
+        }
+      },
+      {
+        "request": {"type": "pending_actions", "player_id": "alice"},
+        "expected": {
+          "success": true,
+          "phase": "taxation",
+          "actions": [
+            {"type": "tax_peasants_high", "player_id": "alice", "country_id": "Avalon"}
+          ]
+        }
+      },
+      {
+        "request": {"type": "pending_actions", "player_id": "bob"},
+        "expected": {
+          "success": true,
+          "phase": "taxation",
+          "actions": [
+            {"type": "tax_peasants_low", "player_id": "bob", "country_id": "Britannia"}
+          ]
+        }
+      },
+      {
         "request": {"type": "get_state"},
         "expected": {
           "state": {
@@ -223,6 +254,16 @@
           ]
         },
         "expected": {"success": true, "queued_actions": 6, "phase": "spending"}
+      },
+      {
+        "request": {"type": "pending_actions", "player_id": "charlie"},
+        "expected": {
+          "success": true,
+          "phase": "spending",
+          "actions": [
+            {"type": "merchant_invest", "player_id": "charlie", "merchant_id": "charlie", "amount": 3}
+          ]
+        }
       },
       {
         "request": {"type": "advance"},

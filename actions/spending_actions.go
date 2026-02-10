@@ -41,7 +41,7 @@ func (a *BuildArmyAction) Validate(state *engine.GameState) error {
 	return nil
 }
 
-func (a *BuildArmyAction) Apply(state *engine.GameState, roller DiceRoller) (*engine.GameState, []events.Event) {
+func (a *BuildArmyAction) Apply(state *engine.GameState, roller engine.DiceRoller) (*engine.GameState, []events.Event) {
 	newState := state.Clone()
 	country := newState.GetCountry(a.CountryID)
 	var evts []events.Event
@@ -98,7 +98,7 @@ func (a *MonarchInvestAction) Validate(state *engine.GameState) error {
 	return nil
 }
 
-func (a *MonarchInvestAction) Apply(state *engine.GameState, roller DiceRoller) (*engine.GameState, []events.Event) {
+func (a *MonarchInvestAction) Apply(state *engine.GameState, roller engine.DiceRoller) (*engine.GameState, []events.Event) {
 	newState := state.Clone()
 	country := newState.GetCountry(a.CountryID)
 	merchant := newState.GetMerchant(a.MerchantID)
@@ -149,7 +149,7 @@ func (a *MerchantInvestAction) Validate(state *engine.GameState) error {
 	return nil
 }
 
-func (a *MerchantInvestAction) Apply(state *engine.GameState, roller DiceRoller) (*engine.GameState, []events.Event) {
+func (a *MerchantInvestAction) Apply(state *engine.GameState, roller engine.DiceRoller) (*engine.GameState, []events.Event) {
 	newState := state.Clone()
 	merchant := newState.GetMerchant(a.MerchantID)
 	var evts []events.Event
@@ -191,7 +191,7 @@ func (a *MerchantHideAction) Validate(state *engine.GameState) error {
 	return nil
 }
 
-func (a *MerchantHideAction) Apply(state *engine.GameState, roller DiceRoller) (*engine.GameState, []events.Event) {
+func (a *MerchantHideAction) Apply(state *engine.GameState, roller engine.DiceRoller) (*engine.GameState, []events.Event) {
 	// Hiding is a no-op - gold stays in StoredGold
 	return state.Clone(), nil
 }

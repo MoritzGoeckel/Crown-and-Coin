@@ -54,8 +54,10 @@ func SerializeMerchant(m *engine.Merchant) *MerchantJSON {
 	}
 }
 
-// SerializeAction converts an action to ActionJSON with placeholders for choices
-func SerializeAction(action actions.Action, state *engine.GameState) ActionJSON {
+// SerializeAction converts an action to ActionJSON
+// If usePlaceholders is true, amounts will be converted to placeholders like "<AMOUNT:0-10>"
+// If false, the actual amount values from the action will be used
+func SerializeAction(action actions.Action, state *engine.GameState, usePlaceholders bool) ActionJSON {
 	aj := ActionJSON{
 		Type:     string(action.Type()),
 		PlayerID: action.PlayerID(),
@@ -70,37 +72,35 @@ func SerializeAction(action actions.Action, state *engine.GameState) ActionJSON 
 	case *actions.TaxMerchantsAction:
 		aj.CountryID = a.CountryID
 		aj.MerchantID = a.MerchantID
-		// Calculate max amount (merchant's stored gold)
-		if merchant := state.GetMerchant(a.MerchantID); merchant != nil {
-			aj.Amount = fmt.Sprintf("<AMOUNT:0-%d>", merchant.StoredGold)
+		if usePlaceholders {
+			aj.Amount = fmt.Sprintf("<AMOUNT:0-%d>", a.Amount)
 		} else {
-			aj.Amount = "<AMOUNT>"
+			aj.Amount = a.Amount
 		}
 
 	case *actions.BuildArmyAction:
 		aj.CountryID = a.CountryID
-		// Calculate max amount (country's gold)
-		if country := state.GetCountry(a.CountryID); country != nil {
-			aj.Amount = fmt.Sprintf("<AMOUNT:0-%d>", country.Gold)
+		if usePlaceholders {
+			aj.Amount = fmt.Sprintf("<AMOUNT:0-%d>", a.Amount)
 		} else {
-			aj.Amount = "<AMOUNT>"
+			aj.Amount = a.Amount
 		}
 
 	case *actions.MonarchInvestAction:
 		aj.CountryID = a.CountryID
 		aj.MerchantID = a.MerchantID
-		if country := state.GetCountry(a.CountryID); country != nil {
-			aj.Amount = fmt.Sprintf("<AMOUNT:0-%d>", country.Gold)
+		if usePlaceholders {
+			aj.Amount = fmt.Sprintf("<AMOUNT:0-%d>", a.Amount)
 		} else {
-			aj.Amount = "<AMOUNT>"
+			aj.Amount = a.Amount
 		}
 
 	case *actions.MerchantInvestAction:
 		aj.MerchantID = a.MerchantID
-		if merchant := state.GetMerchant(a.MerchantID); merchant != nil {
-			aj.Amount = fmt.Sprintf("<AMOUNT:0-%d>", merchant.StoredGold)
+		if usePlaceholders {
+			aj.Amount = fmt.Sprintf("<AMOUNT:0-%d>", a.Amount)
 		} else {
-			aj.Amount = "<AMOUNT>"
+			aj.Amount = a.Amount
 		}
 
 	case *actions.MerchantHideAction:
