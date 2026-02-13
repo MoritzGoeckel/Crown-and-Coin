@@ -53,10 +53,10 @@ The websocket messages follow that patter:
 
 
 # frontend
-- [ ] History of actions should be shown
 - [ ] New game
-- [ ] Save game, so can continue after program restart
-- [ ] Save history of actions / states
+- [ ] Save game, so can continue after program restart (game state, history)
+- [/] History of actions should be shown
+- [/] Save history of actions / states
 - [/] Players are not always updated for admin
 - [/] Refresh loggs out
 - [/] Remove players does not work

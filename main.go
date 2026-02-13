@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"sync"
+	"time"
 
 	"crown_and_coin/engine"
 	"crown_and_coin/jsonapi"
@@ -36,6 +38,28 @@ func (c *ClientConn) sendError(message string) {
 	c.send(resp)
 }
 
+type ActionEntry struct {
+	PlayerID  string                 `json:"player_id"`
+	Action    jsonapi.ActionJSON     `json:"action"`
+	Turn      int                    `json:"turn"`
+	Phase     string                 `json:"phase"`
+	Timestamp time.Time              `json:"timestamp"`
+}
+
+type StateSnapshot struct {
+	Turn      int                    `json:"turn"`
+	Phase     string                 `json:"phase"`
+	State     *jsonapi.StateJSON     `json:"state"`
+	Timestamp time.Time              `json:"timestamp"`
+}
+
+type GameHistory struct {
+	GameName       string           `json:"game_name"`
+	Actions        []ActionEntry    `json:"actions"`
+	StateSnapshots []StateSnapshot  `json:"state_snapshots"`
+	PhaseStartIdx  int              `json:"phase_start_idx"` // Index in Actions where current phase started
+}
+
 type Server struct {
 	users    map[string]*User // name -> user
 	mu       sync.RWMutex
@@ -44,6 +68,9 @@ type Server struct {
 
 	clients   map[*ClientConn]string // connection -> username
 	clientsMu sync.RWMutex
+
+	history   *GameHistory
+	historyMu sync.RWMutex
 }
 
 type ClientMessage struct {
@@ -58,6 +85,7 @@ type ErrorResponse struct {
 }
 
 func NewServer() *Server {
+	gameName := time.Now().Format("2006-01-02_15-04-05")
 	return &Server{
 		users:   make(map[string]*User),
 		clients: make(map[*ClientConn]string),
@@ -66,6 +94,12 @@ func NewServer() *Server {
 			CheckOrigin: func(r *http.Request) bool {
 				return true
 			},
+		},
+		history: &GameHistory{
+			GameName:       gameName,
+			Actions:        make([]ActionEntry, 0),
+			StateSnapshots: make([]StateSnapshot, 0),
+			PhaseStartIdx:  0,
 		},
 	}
 }
@@ -117,7 +151,7 @@ func (s *Server) canSendMessage(user string, payload json.RawMessage) bool {
 	}
 
 	switch msg.Type {
-	case "get_state", "get_players", "get_connected_players":
+	case "get_state", "get_players", "get_connected_players", "get_history":
 		return true
 	case "get_actions", "get_queued":
 		return msg.PlayerID == user
@@ -175,6 +209,157 @@ func (s *Server) broadcastConnectedPlayers() {
 
 	for client := range s.clients {
 		client.send(msg)
+	}
+}
+
+func (s *Server) broadcastHistoryToAdmin() {
+	s.clientsMu.RLock()
+	defer s.clientsMu.RUnlock()
+	s.historyMu.RLock()
+	defer s.historyMu.RUnlock()
+
+	msg, _ := json.Marshal(map[string]interface{}{
+		"type":    "history_update",
+		"success": true,
+		"history": s.history,
+	})
+
+	for client, username := range s.clients {
+		if username == "admin" {
+			client.send(msg)
+		}
+	}
+}
+
+func (s *Server) broadcastHistoryToPlayers() {
+	s.clientsMu.RLock()
+	defer s.clientsMu.RUnlock()
+
+	playerHistory := s.getHistoryForPlayer()
+	msg, _ := json.Marshal(map[string]interface{}{
+		"type":    "history_update",
+		"success": true,
+		"history": playerHistory,
+	})
+
+	for client, username := range s.clients {
+		if username != "admin" {
+			client.send(msg)
+		}
+	}
+}
+
+func (s *Server) getHistoryForPlayer() interface{} {
+	s.historyMu.RLock()
+	defer s.historyMu.RUnlock()
+
+	// Players get actions only from the beginning of current phase
+	playerActions := s.history.Actions[:s.history.PhaseStartIdx]
+
+	// Players get state snapshots up to (but not including) the current phase
+	playerSnapshots := s.history.StateSnapshots
+	if len(playerSnapshots) > 0 {
+		// Remove the most recent snapshot if it's from the current phase
+		currentPhase := s.api.GetEngine().GetState().Phase.String()
+		if playerSnapshots[len(playerSnapshots)-1].Phase == currentPhase {
+			playerSnapshots = playerSnapshots[:len(playerSnapshots)-1]
+		}
+	}
+
+	return map[string]interface{}{
+		"game_name":       s.history.GameName,
+		"actions":         playerActions,
+		"state_snapshots": playerSnapshots,
+		"phase_start_idx": s.history.PhaseStartIdx,
+	}
+}
+
+func (s *Server) saveHistoryToMarkdown() error {
+	s.historyMu.RLock()
+	defer s.historyMu.RUnlock()
+
+	filename := s.history.GameName + ".md"
+	f, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	fmt.Fprintf(f, "# Game History: %s\n\n", s.history.GameName)
+
+	// Write state snapshots
+	fmt.Fprintf(f, "## Game States by Phase\n\n")
+	for _, snapshot := range s.history.StateSnapshots {
+		fmt.Fprintf(f, "### Turn %d - %s\n", snapshot.Turn, snapshot.Phase)
+		fmt.Fprintf(f, "*Recorded at: %s*\n\n", snapshot.Timestamp.Format("15:04:05"))
+
+		if snapshot.State != nil {
+			fmt.Fprintf(f, "#### Countries\n")
+			for _, country := range snapshot.State.Countries {
+				status := "Alive"
+				if country.HP <= 0 {
+					status = "Defeated"
+				}
+				fmt.Fprintf(f, "- **%s** (%s): HP=%d, Gold=%d, Army=%d, Peasants=%d\n",
+					country.CountryID, status, country.HP, country.Gold,
+					country.ArmyStrength, country.Peasants)
+			}
+
+			fmt.Fprintf(f, "\n#### Merchants\n")
+			for _, merchant := range snapshot.State.Merchants {
+				fmt.Fprintf(f, "- **%s** in %s: Stored=%d, Invested=%d\n",
+					merchant.PlayerID, merchant.CountryID,
+					merchant.StoredGold, merchant.InvestedGold)
+			}
+		}
+		fmt.Fprintf(f, "\n")
+	}
+
+	// Write action history
+	fmt.Fprintf(f, "## Action History\n\n")
+	currentPhase := ""
+	for _, entry := range s.history.Actions {
+		phaseKey := fmt.Sprintf("Turn %d - %s", entry.Turn, entry.Phase)
+		if phaseKey != currentPhase {
+			currentPhase = phaseKey
+			fmt.Fprintf(f, "### %s\n\n", currentPhase)
+		}
+
+		actionDesc := formatActionForMarkdown(entry.Action)
+		fmt.Fprintf(f, "- **%s**: %s (%s)\n", entry.PlayerID, actionDesc,
+			entry.Timestamp.Format("15:04:05"))
+	}
+
+	log.Printf("Game history saved to %s", filename)
+	return nil
+}
+
+func formatActionForMarkdown(action jsonapi.ActionJSON) string {
+	switch action.Type {
+	case "tax_peasants_low":
+		return "Tax Peasants (Low)"
+	case "tax_peasants_high":
+		return "Tax Peasants (High)"
+	case "tax_merchants":
+		return fmt.Sprintf("Tax %s (%v)", action.MerchantID, action.Amount)
+	case "build_army":
+		return fmt.Sprintf("Build Army (%v)", action.Amount)
+	case "merchant_invest":
+		return fmt.Sprintf("Invest %v", action.Amount)
+	case "merchant_hide":
+		return "Hide Gold"
+	case "attack":
+		return fmt.Sprintf("Attack %s", action.TargetID)
+	case "no_attack":
+		return "No Attack"
+	case "remain":
+		return "Remain"
+	case "flee":
+		return fmt.Sprintf("Flee to %s", action.TargetID)
+	case "revolt":
+		return "Revolt"
+	default:
+		return action.Type
 	}
 }
 
@@ -239,7 +424,7 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		// Handle get_connected_players separately (not part of game engine)
+		// Handle non-engine messages separately
 		var msgType struct {
 			Type string `json:"type"`
 		}
@@ -256,6 +441,110 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
+		if msgType.Type == "get_history" {
+			var history interface{}
+			if clientMsg.User == "admin" {
+				s.historyMu.RLock()
+				history = s.history
+				s.historyMu.RUnlock()
+			} else {
+				history = s.getHistoryForPlayer()
+			}
+			resp, _ := json.Marshal(map[string]interface{}{
+				"type":    "history",
+				"success": true,
+				"history": history,
+			})
+			client.send(resp)
+			continue
+		}
+
+		// Handle advance separately to record state snapshot
+		if msgType.Type == "advance" {
+			response, err := s.api.ProcessMessage(clientMsg.Payload)
+			if err != nil {
+				log.Printf("Engine error: %v", err)
+				client.sendError(err.Error())
+				continue
+			}
+
+			// Parse the response to get the new state
+			var advanceResp struct {
+				Success bool               `json:"success"`
+				State   *jsonapi.StateJSON `json:"state"`
+			}
+			if err := json.Unmarshal(response, &advanceResp); err == nil && advanceResp.Success {
+				// Record state snapshot
+				s.historyMu.Lock()
+				snapshot := StateSnapshot{
+					Turn:      advanceResp.State.Turn,
+					Phase:     advanceResp.State.Phase,
+					State:     advanceResp.State,
+					Timestamp: time.Now(),
+				}
+				s.history.StateSnapshots = append(s.history.StateSnapshots, snapshot)
+
+				// Update phase start index to current length (new phase begins)
+				s.history.PhaseStartIdx = len(s.history.Actions)
+				s.historyMu.Unlock()
+
+				// Broadcast updated history to admin
+				s.broadcastHistoryToAdmin()
+
+				// Broadcast updated history to players (they get old version)
+				s.broadcastHistoryToPlayers()
+
+				// Save to markdown file
+				go s.saveHistoryToMarkdown()
+			}
+
+			if err := client.send(response); err != nil {
+				log.Printf("Write error: %v", err)
+				break
+			}
+			continue
+		}
+
+		// Handle submit separately to record action
+		if msgType.Type == "submit" {
+			response, err := s.api.ProcessMessage(clientMsg.Payload)
+			if err != nil {
+				log.Printf("Engine error: %v", err)
+				client.sendError(err.Error())
+				continue
+			}
+
+			// Parse the response to check if action was successful
+			var submitResp struct {
+				Success bool               `json:"success"`
+				Action  jsonapi.ActionJSON `json:"action"`
+			}
+			if err := json.Unmarshal(response, &submitResp); err == nil && submitResp.Success {
+				// Record the successful action
+				state := s.api.GetEngine().GetState()
+				s.historyMu.Lock()
+				entry := ActionEntry{
+					PlayerID:  submitResp.Action.PlayerID,
+					Action:    submitResp.Action,
+					Turn:      state.Turn,
+					Phase:     state.Phase.String(),
+					Timestamp: time.Now(),
+				}
+				s.history.Actions = append(s.history.Actions, entry)
+				s.historyMu.Unlock()
+
+				// Broadcast updated history to admin
+				s.broadcastHistoryToAdmin()
+			}
+
+			if err := client.send(response); err != nil {
+				log.Printf("Write error: %v", err)
+				break
+			}
+			continue
+		}
+
+		// Process all other engine messages normally
 		response, err := s.api.ProcessMessage(clientMsg.Payload)
 		if err != nil {
 			log.Printf("Engine error: %v", err)

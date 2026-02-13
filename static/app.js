@@ -5,6 +5,7 @@ let gameState = null;
 let lastStateJSON = '';
 let connectedPlayers = [];
 let refreshInterval = null;
+let gameHistory = null;
 
 // Cookie helpers
 function setCookie(name, value, days = 365) {
@@ -48,6 +49,8 @@ const queuedActionsList = document.getElementById('queued-actions-list');
 const rejectedActionsList = document.getElementById('rejected-actions-list');
 const adminPanel = document.getElementById('admin-panel');
 const logoutBtn = document.getElementById('logout-btn');
+const gameNameDisplay = document.getElementById('game-name-display');
+const historyDisplay = document.getElementById('history-display');
 
 loginBtn.addEventListener('click', login);
 signupBtn.addEventListener('click', signup);
@@ -178,20 +181,22 @@ function connectToServer(name, secret) {
 
         if (currentUser === 'admin') {
             adminPanel.classList.remove('hidden');
-            document.getElementById('game-content').style.gridTemplateColumns = '1fr 1fr 1fr';
+            document.getElementById('game-content').style.gridTemplateColumns = '1fr 1fr 1fr 1fr';
         } else {
-            document.getElementById('game-content').style.gridTemplateColumns = '1fr 1fr';
+            document.getElementById('game-content').style.gridTemplateColumns = '1fr 1fr 1fr';
         }
 
         log('Connected to server', 'received');
         refreshState();
         refreshActions();
         refreshQueuedActions();
+        refreshHistory();
 
         refreshInterval = setInterval(() => {
             refreshState();
             refreshActions();
             refreshQueuedActions();
+            refreshHistory();
         }, 5000);
     };
 
@@ -205,6 +210,15 @@ function connectToServer(name, secret) {
             renderConnectedPlayers();
             updateMonarchSelect();
             updateMerchantSelect();
+            return;
+        }
+
+        // Handle history response
+        if (data.type === 'history' || data.type === 'history_update') {
+            if (data.history) {
+                gameHistory = data.history;
+                renderHistory(data.history);
+            }
             return;
         }
 
@@ -296,6 +310,10 @@ function refreshQueuedActions() {
     }
 }
 
+function refreshHistory() {
+    send({ type: 'get_history' });
+}
+
 function logout() {
     if (ws) {
         ws.close();
@@ -310,6 +328,7 @@ function logout() {
     gameState = null;
     lastStateJSON = '';
     connectedPlayers = [];
+    gameHistory = null;
 
     // Clear cookies
     deleteCookie('crown_user');
@@ -332,6 +351,8 @@ function logout() {
     merchantsDisplay.innerHTML = '';
     actionsList.innerHTML = '';
     queuedActionsList.innerHTML = '';
+    historyDisplay.innerHTML = '';
+    gameNameDisplay.textContent = '';
 }
 
 function renderState(state) {
@@ -736,6 +757,101 @@ function formatAction(action) {
             return 'Revolt!';
         default:
             return action.type;
+    }
+}
+
+function renderHistory(history) {
+    if (!history) return;
+
+    // Display game name
+    if (history.game_name) {
+        gameNameDisplay.textContent = `Game: ${history.game_name}`;
+    }
+
+    historyDisplay.innerHTML = '';
+
+    // Group actions by phase
+    const actionsByPhase = {};
+    const actions = history.actions || [];
+
+    actions.forEach(entry => {
+        const key = `Turn ${entry.turn} - ${formatPhase(entry.phase)}`;
+        if (!actionsByPhase[key]) {
+            actionsByPhase[key] = [];
+        }
+        actionsByPhase[key].push(entry);
+    });
+
+    // Render actions grouped by phase
+    Object.keys(actionsByPhase).forEach(phaseKey => {
+        const group = document.createElement('div');
+        group.className = 'history-phase-group';
+
+        const header = document.createElement('div');
+        header.className = 'history-phase-header';
+        header.textContent = phaseKey;
+        group.appendChild(header);
+
+        actionsByPhase[phaseKey].forEach(entry => {
+            const actionDiv = document.createElement('div');
+            actionDiv.className = 'history-action-entry';
+
+            const playerSpan = document.createElement('span');
+            playerSpan.className = 'history-player';
+            playerSpan.textContent = entry.player_id + ': ';
+
+            const actionSpan = document.createElement('span');
+            actionSpan.className = 'history-action';
+            actionSpan.textContent = formatAction(entry.action);
+
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'history-time';
+            if (entry.timestamp) {
+                const time = new Date(entry.timestamp);
+                timeSpan.textContent = time.toLocaleTimeString();
+            }
+
+            actionDiv.appendChild(playerSpan);
+            actionDiv.appendChild(actionSpan);
+            actionDiv.appendChild(timeSpan);
+            group.appendChild(actionDiv);
+        });
+
+        historyDisplay.appendChild(group);
+    });
+
+    // Render state snapshots
+    const snapshots = history.state_snapshots || [];
+    snapshots.forEach(snapshot => {
+        const snapshotDiv = document.createElement('div');
+        snapshotDiv.className = 'history-snapshot';
+
+        const title = document.createElement('div');
+        title.className = 'history-snapshot-title';
+        title.textContent = `End of Turn ${snapshot.turn} - ${snapshot.phase}`;
+        snapshotDiv.appendChild(title);
+
+        const data = document.createElement('div');
+        data.className = 'history-snapshot-data';
+
+        if (snapshot.state) {
+            const countriesCount = Object.keys(snapshot.state.countries || {}).length;
+            const merchantsCount = Object.keys(snapshot.state.merchants || {}).length;
+            data.textContent = `${countriesCount} countries, ${merchantsCount} merchants`;
+        }
+
+        snapshotDiv.appendChild(data);
+        historyDisplay.appendChild(snapshotDiv);
+    });
+
+    // Show message if no history
+    if (actions.length === 0 && snapshots.length === 0) {
+        const empty = document.createElement('div');
+        empty.textContent = 'No history yet';
+        empty.style.color = '#666';
+        empty.style.textAlign = 'center';
+        empty.style.padding = '2rem';
+        historyDisplay.appendChild(empty);
     }
 }
 
