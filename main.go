@@ -341,8 +341,8 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 func main() {
 	server := NewServer()
 
-	// Create admin user with generated secret
-	adminSecret := generateSecret()
+	// Create admin user with fixed secret
+	adminSecret := "crown"
 	server.users["admin"] = &User{Name: "admin", Secret: adminSecret}
 	fmt.Printf("Admin secret: %s\n", adminSecret)
 

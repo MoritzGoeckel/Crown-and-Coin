@@ -69,10 +69,9 @@ The websocket messages follow that patter:
 - [x] Reject contradicting actions
 - [/] Invest <AMOUNT:0-5> shown
 - [ ] Can't put money for investing as merchant
-- [ ] Clear pending actions
+- [?] Clear pending actions
 - [/] Fix high and low taxation at the same time
 - [/] Monarch can't tax merchants but should
-
 - [/] Monarchs start with 10 gold
 - [/] Merchants should start with 5 and get another 5 every round
 

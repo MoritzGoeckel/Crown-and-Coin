@@ -6,6 +6,29 @@ let lastStateJSON = '';
 let connectedPlayers = [];
 let refreshInterval = null;
 
+// Cookie helpers
+function setCookie(name, value, days = 365) {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    const expires = "expires=" + date.toUTCString();
+    document.cookie = name + "=" + value + ";" + expires + ";path=/";
+}
+
+function getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+}
+
+function deleteCookie(name) {
+    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+}
+
 const loginScreen = document.getElementById('login-screen');
 const gameScreen = document.getElementById('game-screen');
 const loginUsernameInput = document.getElementById('login-username');
@@ -91,6 +114,9 @@ async function signup() {
 
         if (response.ok) {
             signupError.textContent = '';
+            // Save credentials to cookie
+            setCookie('crown_user', name);
+            setCookie('crown_secret', secret);
             // Auto-login after successful registration
             connectToServer(name, secret);
         } else {
@@ -123,6 +149,9 @@ async function login() {
 
         if (response.ok) {
             loginError.textContent = '';
+            // Save credentials to cookie
+            setCookie('crown_user', name);
+            setCookie('crown_secret', secret);
             connectToServer(name, secret);
         } else {
             const text = await response.text();
@@ -282,6 +311,10 @@ function logout() {
     lastStateJSON = '';
     connectedPlayers = [];
 
+    // Clear cookies
+    deleteCookie('crown_user');
+    deleteCookie('crown_secret');
+
     gameScreen.classList.add('hidden');
     adminPanel.classList.add('hidden');
     loginScreen.classList.remove('hidden');
@@ -302,7 +335,7 @@ function logout() {
 }
 
 function renderState(state) {
-    phaseInfo.textContent = `Turn ${state.turn} - ${formatPhase(state.phase)}`;
+    phaseInfo.textContent = `Round ${state.turn} - Phase ${formatPhase(state.phase)}`;
 
     countriesDisplay.innerHTML = '';
     for (const [id, country] of Object.entries(state.countries || {})) {
@@ -705,3 +738,16 @@ function formatAction(action) {
             return action.type;
     }
 }
+
+// Auto-login on page load if credentials are saved
+window.addEventListener('DOMContentLoaded', () => {
+    const savedUser = getCookie('crown_user');
+    const savedSecret = getCookie('crown_secret');
+
+    if (savedUser && savedSecret) {
+        // Attempt to auto-login
+        loginUsernameInput.value = savedUser;
+        loginSecretInput.value = savedSecret;
+        login();
+    }
+});
