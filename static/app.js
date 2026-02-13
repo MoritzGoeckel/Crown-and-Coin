@@ -228,17 +228,17 @@ function connectToServer(name, secret) {
             }
         }
 
-        // Handle rejected actions from submit responses
-        if (data.rejected_actions && data.rejected_actions.length > 0) {
-            renderRejectedActions(data.rejected_actions);
-        } else if (data.queued_actions !== undefined) {
-            // Clear rejected actions on successful submit
-            renderRejectedActions([]);
-        }
-
-        // Refresh queued actions after submit response
-        if (data.queued_actions !== undefined) {
-            refreshQueuedActions();
+        // Handle submit response (new format with single action)
+        if (data.action !== undefined) {
+            if (data.success === false && data.rejection_reason) {
+                // Convert to old rejected_actions format for existing render function
+                renderRejectedActions([{ action: data.action, reason: data.rejection_reason }]);
+            } else if (data.success === true) {
+                // Clear rejected actions on successful submit
+                renderRejectedActions([]);
+                // Refresh queued actions after successful submit
+                refreshQueuedActions();
+            }
         }
     };
 
@@ -603,7 +603,7 @@ function renderActions(actions) {
                 const amount = parseInt(input.value);
                 if (!isNaN(amount) && amount >= range.min && amount <= range.max) {
                     const submitAction = { ...action, amount };
-                    send({ type: 'submit', actions: [submitAction] });
+                    send({ type: 'submit', action: submitAction });
                 }
             });
 
@@ -615,7 +615,7 @@ function renderActions(actions) {
             const btn = document.createElement('button');
             btn.textContent = formatAction(action);
             btn.addEventListener('click', () => {
-                send({ type: 'submit', actions: [action] });
+                send({ type: 'submit', action: action });
             });
             actionsList.appendChild(btn);
         }

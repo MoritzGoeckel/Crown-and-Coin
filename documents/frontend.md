@@ -53,16 +53,16 @@ The websocket messages follow that patter:
 
 
 # frontend
-- [x] Login works even though you are not registered
-- [/] Remove players does not work
-- [ ] Refresh loggs out
-- [ ] Players are not always updated for admin
-- [ ] Write phase and turn
 - [ ] History of actions should be shown
-- [ ] Set fixed admin password
 - [ ] New game
-- [ ] Save history of actions / states
 - [ ] Save game, so can continue after program restart
+- [ ] Save history of actions / states
+- [/] Players are not always updated for admin
+- [/] Refresh loggs out
+- [/] Remove players does not work
+- [/] Set fixed admin password
+- [/] Write phase and turn
+- [x] Login works even though you are not registered
 
 # engine
 - [x] Queue multiple actions

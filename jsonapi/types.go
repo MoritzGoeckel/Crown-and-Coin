@@ -61,10 +61,10 @@ type GetPendingActionsRequest struct {
 	PlayerID string      `json:"player_id,omitempty"` // Optional: if empty, returns all actions (admin only)
 }
 
-// SubmitRequest submits actions for the current phase
+// SubmitRequest submits a single action for the current phase
 type SubmitRequest struct {
-	Type    RequestType  `json:"type"`
-	Actions []ActionJSON `json:"actions"`
+	Type   RequestType `json:"type"`
+	Action ActionJSON  `json:"action"`
 }
 
 // ActionJSON is a generic JSON representation of any action
@@ -157,18 +157,11 @@ type ActionsResponse struct {
 	Actions  []ActionJSON `json:"actions"`
 }
 
-// RejectedAction describes an action that was rejected during submission
-type RejectedAction struct {
-	Action ActionJSON `json:"action"`
-	Reason string     `json:"reason"`
-}
-
-// SubmitResponse confirms actions were queued
+// SubmitResponse confirms action was queued or rejected
 type SubmitResponse struct {
-	Success         bool             `json:"success"`
-	QueuedActions   int              `json:"queued_actions"`
-	Phase           string           `json:"phase"`
-	RejectedActions []RejectedAction `json:"rejected_actions,omitempty"`
+	Success         bool       `json:"success"`
+	Action          ActionJSON `json:"action"`
+	RejectionReason string     `json:"rejection_reason,omitempty"`
 }
 
 // QueuedResponse returns currently queued actions

@@ -87,12 +87,16 @@
       {
         "request": {
           "type": "submit",
-          "actions": [
-            {"type": "tax_peasants_high", "player_id": "alice", "country_id": "Avalon"},
-            {"type": "tax_peasants_low", "player_id": "bob", "country_id": "Britannia"}
-          ]
+          "action": {"type": "tax_peasants_high", "player_id": "alice", "country_id": "Avalon"}
         },
-        "expected": {"success": true, "queued_actions": 2, "phase": "taxation"}
+        "expected": {"success": true, "action": {"type": "tax_peasants_high", "player_id": "alice", "country_id": "Avalon"}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "tax_peasants_low", "player_id": "bob", "country_id": "Britannia"}
+        },
+        "expected": {"success": true, "action": {"type": "tax_peasants_low", "player_id": "bob", "country_id": "Britannia"}}
       },
       {
         "request": {"type": "pending_actions"},
@@ -244,16 +248,44 @@
       {
         "request": {
           "type": "submit",
-          "actions": [
-            {"type": "build_army", "player_id": "alice", "country_id": "Avalon", "amount": 8},
-            {"type": "build_army", "player_id": "bob", "country_id": "Britannia", "amount": 3},
-            {"type": "merchant_invest", "player_id": "charlie", "merchant_id": "charlie", "amount": 3},
-            {"type": "merchant_hide", "player_id": "eve", "merchant_id": "eve"},
-            {"type": "merchant_invest", "player_id": "diana", "merchant_id": "diana", "amount": 4},
-            {"type": "merchant_invest", "player_id": "frank", "merchant_id": "frank", "amount": 2}
-          ]
+          "action": {"type": "build_army", "player_id": "alice", "country_id": "Avalon", "amount": 8}
         },
-        "expected": {"success": true, "queued_actions": 6, "phase": "spending"}
+        "expected": {"success": true, "action": {"type": "build_army", "player_id": "alice", "country_id": "Avalon", "amount": 8}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "build_army", "player_id": "bob", "country_id": "Britannia", "amount": 3}
+        },
+        "expected": {"success": true, "action": {"type": "build_army", "player_id": "bob", "country_id": "Britannia", "amount": 3}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "merchant_invest", "player_id": "charlie", "merchant_id": "charlie", "amount": 3}
+        },
+        "expected": {"success": true, "action": {"type": "merchant_invest", "player_id": "charlie", "merchant_id": "charlie", "amount": 3}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "merchant_hide", "player_id": "eve", "merchant_id": "eve"}
+        },
+        "expected": {"success": true, "action": {"type": "merchant_hide", "player_id": "eve", "merchant_id": "eve"}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "merchant_invest", "player_id": "diana", "merchant_id": "diana", "amount": 4}
+        },
+        "expected": {"success": true, "action": {"type": "merchant_invest", "player_id": "diana", "merchant_id": "diana", "amount": 4}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "merchant_invest", "player_id": "frank", "merchant_id": "frank", "amount": 2}
+        },
+        "expected": {"success": true, "action": {"type": "merchant_invest", "player_id": "frank", "merchant_id": "frank", "amount": 2}}
       },
       {
         "request": {"type": "pending_actions", "player_id": "charlie"},
@@ -312,11 +344,9 @@
       {
         "request": {
           "type": "submit",
-          "actions": [
-            {"type": "attack", "player_id": "alice", "country_id": "Avalon", "target_id": "Britannia"}
-          ]
+          "action": {"type": "attack", "player_id": "alice", "country_id": "Avalon", "target_id": "Britannia"}
         },
-        "expected": {"success": true, "queued_actions": 1, "phase": "war"}
+        "expected": {"success": true, "action": {"type": "attack", "player_id": "alice", "country_id": "Avalon", "target_id": "Britannia"}}
       },
       {
         "request": {"type": "advance"},
@@ -344,14 +374,30 @@
       {
         "request": {
           "type": "submit",
-          "actions": [
-            {"type": "remain", "player_id": "charlie", "merchant_id": "charlie"},
-            {"type": "remain", "player_id": "eve", "merchant_id": "eve"},
-            {"type": "flee", "player_id": "diana", "merchant_id": "diana", "target_id": "Avalon"},
-            {"type": "remain", "player_id": "frank", "merchant_id": "frank"}
-          ]
+          "action": {"type": "remain", "player_id": "charlie", "merchant_id": "charlie"}
         },
-        "expected": {"success": true, "queued_actions": 4, "phase": "assessment"}
+        "expected": {"success": true, "action": {"type": "remain", "player_id": "charlie", "merchant_id": "charlie"}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "remain", "player_id": "eve", "merchant_id": "eve"}
+        },
+        "expected": {"success": true, "action": {"type": "remain", "player_id": "eve", "merchant_id": "eve"}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "flee", "player_id": "diana", "merchant_id": "diana", "target_id": "Avalon"}
+        },
+        "expected": {"success": true, "action": {"type": "flee", "player_id": "diana", "merchant_id": "diana", "target_id": "Avalon"}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "remain", "player_id": "frank", "merchant_id": "frank"}
+        },
+        "expected": {"success": true, "action": {"type": "remain", "player_id": "frank", "merchant_id": "frank"}}
       },
       {
         "request": {"type": "advance"},
@@ -379,13 +425,23 @@
       {
         "request": {
           "type": "submit",
-          "actions": [
-            {"type": "tax_peasants_low", "player_id": "alice", "country_id": "Avalon"},
-            {"type": "tax_peasants_low", "player_id": "bob", "country_id": "Britannia"},
-            {"type": "tax_merchants", "player_id": "alice", "country_id": "Avalon", "merchant_id": "charlie", "amount": 2}
-          ]
+          "action": {"type": "tax_peasants_low", "player_id": "alice", "country_id": "Avalon"}
         },
-        "expected": {"success": true, "queued_actions": 3, "phase": "taxation"}
+        "expected": {"success": true, "action": {"type": "tax_peasants_low", "player_id": "alice", "country_id": "Avalon"}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "tax_peasants_low", "player_id": "bob", "country_id": "Britannia"}
+        },
+        "expected": {"success": true, "action": {"type": "tax_peasants_low", "player_id": "bob", "country_id": "Britannia"}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "tax_merchants", "player_id": "alice", "country_id": "Avalon", "merchant_id": "charlie", "amount": 2}
+        },
+        "expected": {"success": true, "action": {"type": "tax_merchants", "player_id": "alice", "country_id": "Avalon", "merchant_id": "charlie", "amount": 2}}
       },
       {
         "request": {"type": "advance"},
@@ -436,16 +492,44 @@
       {
         "request": {
           "type": "submit",
-          "actions": [
-            {"type": "build_army", "player_id": "alice", "country_id": "Avalon", "amount": 12},
-            {"type": "build_army", "player_id": "bob", "country_id": "Britannia", "amount": 7},
-            {"type": "merchant_invest", "player_id": "charlie", "merchant_id": "charlie", "amount": 5},
-            {"type": "merchant_invest", "player_id": "eve", "merchant_id": "eve", "amount": 5},
-            {"type": "merchant_invest", "player_id": "diana", "merchant_id": "diana", "amount": 3},
-            {"type": "merchant_invest", "player_id": "frank", "merchant_id": "frank", "amount": 6}
-          ]
+          "action": {"type": "build_army", "player_id": "alice", "country_id": "Avalon", "amount": 12}
         },
-        "expected": {"success": true, "queued_actions": 6, "phase": "spending"}
+        "expected": {"success": true, "action": {"type": "build_army", "player_id": "alice", "country_id": "Avalon", "amount": 12}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "build_army", "player_id": "bob", "country_id": "Britannia", "amount": 7}
+        },
+        "expected": {"success": true, "action": {"type": "build_army", "player_id": "bob", "country_id": "Britannia", "amount": 7}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "merchant_invest", "player_id": "charlie", "merchant_id": "charlie", "amount": 5}
+        },
+        "expected": {"success": true, "action": {"type": "merchant_invest", "player_id": "charlie", "merchant_id": "charlie", "amount": 5}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "merchant_invest", "player_id": "eve", "merchant_id": "eve", "amount": 5}
+        },
+        "expected": {"success": true, "action": {"type": "merchant_invest", "player_id": "eve", "merchant_id": "eve", "amount": 5}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "merchant_invest", "player_id": "diana", "merchant_id": "diana", "amount": 3}
+        },
+        "expected": {"success": true, "action": {"type": "merchant_invest", "player_id": "diana", "merchant_id": "diana", "amount": 3}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "merchant_invest", "player_id": "frank", "merchant_id": "frank", "amount": 6}
+        },
+        "expected": {"success": true, "action": {"type": "merchant_invest", "player_id": "frank", "merchant_id": "frank", "amount": 6}}
       },
       {
         "request": {"type": "advance"},
@@ -473,11 +557,9 @@
       {
         "request": {
           "type": "submit",
-          "actions": [
-            {"type": "attack", "player_id": "alice", "country_id": "Avalon", "target_id": "Britannia"}
-          ]
+          "action": {"type": "attack", "player_id": "alice", "country_id": "Avalon", "target_id": "Britannia"}
         },
-        "expected": {"success": true, "queued_actions": 1, "phase": "war"}
+        "expected": {"success": true, "action": {"type": "attack", "player_id": "alice", "country_id": "Avalon", "target_id": "Britannia"}}
       },
       {
         "request": {"type": "advance"},
@@ -505,14 +587,30 @@
       {
         "request": {
           "type": "submit",
-          "actions": [
-            {"type": "remain", "player_id": "charlie", "merchant_id": "charlie"},
-            {"type": "remain", "player_id": "eve", "merchant_id": "eve"},
-            {"type": "remain", "player_id": "diana", "merchant_id": "diana"},
-            {"type": "revolt", "player_id": "frank", "merchant_id": "frank", "country_id": "Britannia"}
-          ]
+          "action": {"type": "remain", "player_id": "charlie", "merchant_id": "charlie"}
         },
-        "expected": {"success": true, "queued_actions": 4, "phase": "assessment"}
+        "expected": {"success": true, "action": {"type": "remain", "player_id": "charlie", "merchant_id": "charlie"}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "remain", "player_id": "eve", "merchant_id": "eve"}
+        },
+        "expected": {"success": true, "action": {"type": "remain", "player_id": "eve", "merchant_id": "eve"}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "remain", "player_id": "diana", "merchant_id": "diana"}
+        },
+        "expected": {"success": true, "action": {"type": "remain", "player_id": "diana", "merchant_id": "diana"}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "revolt", "player_id": "frank", "merchant_id": "frank", "country_id": "Britannia"}
+        },
+        "expected": {"success": true, "action": {"type": "revolt", "player_id": "frank", "merchant_id": "frank", "country_id": "Britannia"}}
       },
       {
         "request": {"type": "advance"},
@@ -575,11 +673,9 @@
         "comment": "Submit taxation to give country some gold (10 gold from high tax)",
         "request": {
           "type": "submit",
-          "actions": [
-            {"type": "tax_peasants_high", "player_id": "monarch1", "country_id": "TestLand"}
-          ]
+          "action": {"type": "tax_peasants_high", "player_id": "monarch1", "country_id": "TestLand"}
         },
-        "expected": {"success": true, "queued_actions": 1, "phase": "taxation"}
+        "expected": {"success": true, "action": {"type": "tax_peasants_high", "player_id": "monarch1", "country_id": "TestLand"}}
       },
       {
         "request": {"type": "advance"},
@@ -623,34 +719,23 @@
         "comment": "Submit valid build_army action for 5 gold",
         "request": {
           "type": "submit",
-          "actions": [
-            {"type": "build_army", "player_id": "monarch1", "country_id": "TestLand", "amount": 5}
-          ]
+          "action": {"type": "build_army", "player_id": "monarch1", "country_id": "TestLand", "amount": 5}
         },
         "expected": {
           "success": true,
-          "queued_actions": 1,
-          "phase": "spending"
+          "action": {"type": "build_army", "player_id": "monarch1", "country_id": "TestLand", "amount": 5}
         }
       },
       {
         "comment": "Try to submit another build_army for 16 gold - should be rejected (only 20 total, 5 already pending)",
         "request": {
           "type": "submit",
-          "actions": [
-            {"type": "build_army", "player_id": "monarch1", "country_id": "TestLand", "amount": 16}
-          ]
+          "action": {"type": "build_army", "player_id": "monarch1", "country_id": "TestLand", "amount": 16}
         },
         "expected": {
           "success": false,
-          "queued_actions": 1,
-          "phase": "spending",
-          "rejected_actions": [
-            {
-              "action": {"type": "build_army", "player_id": "monarch1", "country_id": "TestLand", "amount": 16},
-              "reason": "insufficient gold: trying to spend 21 but only have 20 (including pending actions)"
-            }
-          ]
+          "action": {"type": "build_army", "player_id": "monarch1", "country_id": "TestLand", "amount": 16},
+          "rejection_reason": "insufficient gold: trying to spend 21 but only have 20 (including pending actions)"
         }
       },
       {
@@ -692,34 +777,23 @@
         "comment": "Submit attack action",
         "request": {
           "type": "submit",
-          "actions": [
-            {"type": "attack", "player_id": "monarch1", "country_id": "TestLand", "target_id": "Enemy"}
-          ]
+          "action": {"type": "attack", "player_id": "monarch1", "country_id": "TestLand", "target_id": "Enemy"}
         },
         "expected": {
           "success": true,
-          "queued_actions": 1,
-          "phase": "war"
+          "action": {"type": "attack", "player_id": "monarch1", "country_id": "TestLand", "target_id": "Enemy"}
         }
       },
       {
         "comment": "Try to submit no_attack - should be rejected (already have attack pending)",
         "request": {
           "type": "submit",
-          "actions": [
-            {"type": "no_attack", "player_id": "monarch1", "country_id": "TestLand"}
-          ]
+          "action": {"type": "no_attack", "player_id": "monarch1", "country_id": "TestLand"}
         },
         "expected": {
           "success": false,
-          "queued_actions": 1,
-          "phase": "war",
-          "rejected_actions": [
-            {
-              "action": {"type": "no_attack", "player_id": "monarch1", "country_id": "TestLand"},
-              "reason": "already have an attack action pending, cannot submit another war action"
-            }
-          ]
+          "action": {"type": "no_attack", "player_id": "monarch1", "country_id": "TestLand"},
+          "rejection_reason": "already have an attack action pending, cannot submit another war action"
         }
       },
       {
@@ -746,34 +820,23 @@
         "comment": "Submit remain action for merchant",
         "request": {
           "type": "submit",
-          "actions": [
-            {"type": "remain", "player_id": "merchant1", "merchant_id": "merchant1"}
-          ]
+          "action": {"type": "remain", "player_id": "merchant1", "merchant_id": "merchant1"}
         },
         "expected": {
           "success": true,
-          "queued_actions": 1,
-          "phase": "assessment"
+          "action": {"type": "remain", "player_id": "merchant1", "merchant_id": "merchant1"}
         }
       },
       {
         "comment": "Try to submit flee action - should be rejected (already have remain pending)",
         "request": {
           "type": "submit",
-          "actions": [
-            {"type": "flee", "player_id": "merchant1", "merchant_id": "merchant1", "target_id": "Enemy"}
-          ]
+          "action": {"type": "flee", "player_id": "merchant1", "merchant_id": "merchant1", "target_id": "Enemy"}
         },
         "expected": {
           "success": false,
-          "queued_actions": 1,
-          "phase": "assessment",
-          "rejected_actions": [
-            {
-              "action": {"type": "flee", "player_id": "merchant1", "merchant_id": "merchant1", "target_id": "Enemy"},
-              "reason": "merchant already has an assessment action pending"
-            }
-          ]
+          "action": {"type": "flee", "player_id": "merchant1", "merchant_id": "merchant1", "target_id": "Enemy"},
+          "rejection_reason": "merchant already has an assessment action pending"
         }
       },
       {
@@ -801,34 +864,23 @@
       {
         "request": {
           "type": "submit",
-          "actions": [
-            {"type": "tax_peasants_low", "player_id": "monarch1", "country_id": "TestLand"}
-          ]
+          "action": {"type": "tax_peasants_low", "player_id": "monarch1", "country_id": "TestLand"}
         },
         "expected": {
           "success": true,
-          "queued_actions": 1,
-          "phase": "taxation"
+          "action": {"type": "tax_peasants_low", "player_id": "monarch1", "country_id": "TestLand"}
         }
       },
       {
         "comment": "Try to submit high tax - should be rejected",
         "request": {
           "type": "submit",
-          "actions": [
-            {"type": "tax_peasants_high", "player_id": "monarch1", "country_id": "TestLand"}
-          ]
+          "action": {"type": "tax_peasants_high", "player_id": "monarch1", "country_id": "TestLand"}
         },
         "expected": {
           "success": false,
-          "queued_actions": 1,
-          "phase": "taxation",
-          "rejected_actions": [
-            {
-              "action": {"type": "tax_peasants_high", "player_id": "monarch1", "country_id": "TestLand"},
-              "reason": "country already has a peasant tax action pending (cannot tax peasants multiple times)"
-            }
-          ]
+          "action": {"type": "tax_peasants_high", "player_id": "monarch1", "country_id": "TestLand"},
+          "rejection_reason": "country already has a peasant tax action pending (cannot tax peasants multiple times)"
         }
       }
     ]

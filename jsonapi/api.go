@@ -225,7 +225,6 @@ func (api *GameAPI) handleGetActions(req *GetActionsRequest) *ActionsResponse {
 
 func (api *GameAPI) handleSubmit(req *SubmitRequest) *SubmitResponse {
 	state := api.engine.GetState()
-	var rejectedActions []RejectedAction
 
 	// Get existing pending actions for validation
 	pendingActions := make([]actions.Action, 0)
@@ -235,50 +234,41 @@ func (api *GameAPI) handleSubmit(req *SubmitRequest) *SubmitResponse {
 		}
 	}
 
-	for _, aj := range req.Actions {
-		action, err := DeserializeAction(aj)
-		if err != nil {
-			rejectedActions = append(rejectedActions, RejectedAction{
-				Action: aj,
-				Reason: fmt.Sprintf("invalid action: %v", err),
-			})
-			continue
+	// Deserialize the action
+	action, err := DeserializeAction(req.Action)
+	if err != nil {
+		return &SubmitResponse{
+			Success:         false,
+			Action:          req.Action,
+			RejectionReason: fmt.Sprintf("invalid action: %v", err),
 		}
-
-		// Validate against current state
-		if err := action.Validate(state); err != nil {
-			rejectedActions = append(rejectedActions, RejectedAction{
-				Action: aj,
-				Reason: fmt.Sprintf("validation failed: %v", err),
-			})
-			continue
-		}
-
-		// Validate against pending actions
-		if reason := api.validateAgainstPending(action, pendingActions, state); reason != "" {
-			rejectedActions = append(rejectedActions, RejectedAction{
-				Action: aj,
-				Reason: reason,
-			})
-			continue
-		}
-
-		// Action is valid, add to pending and to local list for subsequent validation
-		api.engine.SubmitAction(action)
-		pendingActions = append(pendingActions, action)
 	}
 
-	response := &SubmitResponse{
-		Success:       len(rejectedActions) == 0, // Only success if no actions were rejected
-		QueuedActions: len(api.engine.GetPendingActions()),
-		Phase:         state.Phase.String(),
+	// Validate against current state
+	if err := action.Validate(state); err != nil {
+		return &SubmitResponse{
+			Success:         false,
+			Action:          req.Action,
+			RejectionReason: fmt.Sprintf("validation failed: %v", err),
+		}
 	}
 
-	if len(rejectedActions) > 0 {
-		response.RejectedActions = rejectedActions
+	// Validate against pending actions
+	if reason := api.validateAgainstPending(action, pendingActions, state); reason != "" {
+		return &SubmitResponse{
+			Success:         false,
+			Action:          req.Action,
+			RejectionReason: reason,
+		}
 	}
 
-	return response
+	// Action is valid, add to pending
+	api.engine.SubmitAction(action)
+
+	return &SubmitResponse{
+		Success: true,
+		Action:  req.Action,
+	}
 }
 
 // validateAgainstPending checks if an action conflicts with already pending actions

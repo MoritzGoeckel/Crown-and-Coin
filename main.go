@@ -42,7 +42,7 @@ type Server struct {
 	api      *jsonapi.GameAPI
 	upgrader websocket.Upgrader
 
-	clients   map[string]*ClientConn
+	clients   map[*ClientConn]string // connection -> username
 	clientsMu sync.RWMutex
 }
 
@@ -60,7 +60,7 @@ type ErrorResponse struct {
 func NewServer() *Server {
 	return &Server{
 		users:   make(map[string]*User),
-		clients: make(map[string]*ClientConn),
+		clients: make(map[*ClientConn]string),
 		api:     jsonapi.NewGameAPIWithDice(engine.NewSeededDice(42)),
 		upgrader: websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
@@ -122,21 +122,16 @@ func (s *Server) canSendMessage(user string, payload json.RawMessage) bool {
 	case "get_actions", "get_queued":
 		return msg.PlayerID == user
 	case "submit":
-		// Check if all actions belong to this user
+		// Check if action belongs to this user
 		var submitMsg struct {
-			Actions []struct {
+			Action struct {
 				PlayerID string `json:"player_id"`
-			} `json:"actions"`
+			} `json:"action"`
 		}
 		if err := json.Unmarshal(payload, &submitMsg); err != nil {
 			return false
 		}
-		for _, action := range submitMsg.Actions {
-			if action.PlayerID != user {
-				return false
-			}
-		}
-		return true
+		return submitMsg.Action.PlayerID == user
 	case "add_country", "add_merchant", "remove_merchant", "advance":
 		return false // admin only
 	default:
@@ -148,10 +143,12 @@ func (s *Server) getConnectedPlayerNames() []string {
 	s.clientsMu.RLock()
 	defer s.clientsMu.RUnlock()
 
-	names := make([]string, 0, len(s.clients))
-	for name := range s.clients {
-		if name != "admin" {
-			names = append(names, name)
+	seen := make(map[string]bool)
+	names := make([]string, 0)
+	for _, username := range s.clients {
+		if username != "admin" && !seen[username] {
+			seen[username] = true
+			names = append(names, username)
 		}
 	}
 	return names
@@ -161,10 +158,12 @@ func (s *Server) broadcastConnectedPlayers() {
 	s.clientsMu.RLock()
 	defer s.clientsMu.RUnlock()
 
-	names := make([]string, 0, len(s.clients))
-	for name := range s.clients {
-		if name != "admin" {
-			names = append(names, name)
+	seen := make(map[string]bool)
+	names := make([]string, 0)
+	for _, username := range s.clients {
+		if username != "admin" && !seen[username] {
+			seen[username] = true
+			names = append(names, username)
 		}
 	}
 
@@ -174,7 +173,7 @@ func (s *Server) broadcastConnectedPlayers() {
 		"players": names,
 	})
 
-	for _, client := range s.clients {
+	for client := range s.clients {
 		client.send(msg)
 	}
 }
@@ -195,9 +194,7 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		if connUser != "" {
 			s.clientsMu.Lock()
-			if existing, ok := s.clients[connUser]; ok && existing == client {
-				delete(s.clients, connUser)
-			}
+			delete(s.clients, client)
 			s.clientsMu.Unlock()
 			log.Printf("Player disconnected: %s", connUser)
 			s.broadcastConnectedPlayers()
@@ -230,7 +227,7 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 		if connUser == "" {
 			connUser = clientMsg.User
 			s.clientsMu.Lock()
-			s.clients[connUser] = client
+			s.clients[client] = connUser
 			s.clientsMu.Unlock()
 			log.Printf("Player connected: %s", connUser)
 			s.broadcastConnectedPlayers()
