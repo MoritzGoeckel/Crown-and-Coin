@@ -59,6 +59,10 @@ The websocket messages follow that patter:
 - [ ] Players are not always updated for admin
 - [ ] Write phase and turn
 - [ ] History of actions should be shown
+- [ ] Set fixed admin password
+- [ ] New game
+- [ ] Save history of actions / states
+- [ ] Save game, so can continue after program restart
 
 # engine
 - [x] Queue multiple actions
@@ -68,11 +72,7 @@ The websocket messages follow that patter:
 - [ ] Clear pending actions
 - [/] Fix high and low taxation at the same time
 - [ ] Monarch can't tax merchants but should
-
 - [ ] Monarchs start with 10 gold
 - [ ] Merchants should start with 5 and get another 5 every round
-
-# frontend
-- [ ] New game
 
 Unique names for players?
