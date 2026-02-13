@@ -1,6 +1,98 @@
-- [ ] Add player input - Implement ActionProvider interface for CLI/network/AI
+- [x] The main should start a webserver serving static content from the `static` folder. In that folder we need an index.html with a js and a css file
+- [x] The main needs to have some kind of user management. The user have a name and a secret. When a user opens the website it should ask it for a name and secret and then send it to register on the server
+- [x] The main should provide a websocket server where the web clients can connect. The websocket receives messages from the client in json format.
+
+The websocket messages follow that patter:
+{"user": "", "secret": "", "payload": {}}
+
+- [x] The server should keep track of the registered users and their secrets. When the server starts it should output the secret of the admin user. The admin user should exist from the beginning.
+- [x] If a message from a user has the wrong secret, it should be discarded and a error message printed and returned to the client
+- [x] The server should start a game using the engine.
+- [x] Check test\scenarios.json to understand the possible messages, create a verification method to check if the "user" is allowed to send this message. The admin user can send any message. The response of the engine should be send back via websocket to the client. Everyone can request get_state
+
+# Now we want to make the interface less technical
+
+## Lets start with the admin window
+
+- [x] The game state should be requested every 5 seconds and rendered in a nice way on the page
+- [x] The admin has an interface to create, edit and delete countries. When doing so the server is notified using the appropriate message
+- [x] The admin also has an non technical way to re assign players as merchants or monarchs for countries (using the messages)
+- [x] The admin can advance the phases, it should send the message to the server
+
+## I observed two bugs that need fixing
+
+- [x] The dropdown for the kingdom closes when a new game state is received. This should only happen if the new game state is actually different.
+- [x] Whenever a player or admin sends a message to the server and received the response, it should ask for a game state update
+
+## Player management
+
+- [x] The server should provide a way to get the names of all connected players, don't confuse that with the get_player message of the game engine
+- [x] The admin should see the current list of players, whenever a player joins he should get the update message via websocket
+- [x] The admin should be only able to create countries with monarchs that actually are in the player pool
+
+## Player interface
+
+- [x] The players should also have a good overview over the game state, think about what can logic/code can be shared with the rendering of the admin page
+- [x] The players should have a visualization of their possible actions (get_actions message), this should update regularily, maybe every 5 seconds, so we know when the game state changed
+
+## General
+
+- [x] There should be a logout button
+
+## 
+
+- [x] The drop down for merchant name should be populated by players in admin menu
+
+- [ ] There needs to be feedback in the interface which action the player logged in. Maybe we need to change engine to ask for chosen action, have that in the game state
+
+- [x] Separate registration and login
+
+- [x] Invest amount changes on update
+
+- [x] Queue multiple actions
+- [x] Reject contradicting actions
+- [x] Invest <AMOUNT:0-5> shown
+- [x] Can't put money for investing as merchant
+- [x] Fix high and low taxation at the same time
+- [x] Monarch can't tax merchants but should
+- [x] Monarchs start with 10 gold
+- [x] Attack action missing?
+- [x] Players are not always updated for admin
+- [x] Refresh loggs out
+- [x] Set fixed admin password
+- [x] Write phase and turn
+- [x] Login works even though you are not registered
+- [x] Players logging in with same name
+- [x] History of actions should be shown
+- [x] Save history of actions / states
+
+# frontend
+
+- [ ] Remove players does not work
+    - Only monarchs and merchants
+    - Does not do anything
+- [ ] New game
+- [ ] Save game, so can continue after program restart (game state, history)
+- [ ] show monarch_invest action as something nice and ther should be a name of a player and the up/down buttons don't work. It always gets reset to 0. Zero is valid, others don't show (even no rejection)
+- [ ] Maybe should reject invest with 0
+- [ ] Tax merchants with too much money should make error message
+- [ ] The actions in the player interface should always be sorted alphabetically
+
+# engine
+- [ ] Cancel pending actions as player
+- [ ] Merchant gold is not calculated correctly after taxation see scenarios.json
+- [ ] Test if high taxation leads to a revolt (-2 hp)
+- [ ] After round, when next round starts with taxation 
+    -> Merchants should get 5
+    -> Investment should double
 - [ ] Add republic voting - Extend actions for merchant republics
-- [ ] Add persistence - Serialize GameState to JSON for save/load
-- [ ] Add unit tests - Use FixedDice for deterministic test scenarios
+
+# Misc
+
+- [ ] Printing history into file should be phase, state, actions ...
+
+Unique names for players?
+
+# install
 
 scoop install ngrok
