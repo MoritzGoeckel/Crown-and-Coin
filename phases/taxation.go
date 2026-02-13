@@ -38,7 +38,7 @@ func (p *TaxationPhase) ValidActions(state *engine.GameState, playerID string) [
 			for _, merchant := range state.GetMerchantsByCountry(country.ID) {
 				// Offer to tax any amount up to merchant's stored gold
 				validActions = append(validActions,
-					actions.NewTaxMerchantsAction(playerID, country.ID, merchant.ID, 0), // Example: no tax
+					actions.NewTaxMerchantsAction(playerID, country.ID, merchant.ID, merchant.StoredGold),
 				)
 			}
 		}

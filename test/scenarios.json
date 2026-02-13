@@ -35,14 +35,14 @@
             "turn": 1,
             "phase": "taxation",
             "countries": {
-              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 0, "gold": 0, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-              "Britannia": {"country_id": "Britannia", "hp": 10, "army_strength": 0, "gold": 0, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
+              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 0, "gold": 10, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+              "Britannia": {"country_id": "Britannia", "hp": 10, "army_strength": 0, "gold": 10, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
             },
             "merchants": {
-              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 0, "invested_gold": 0},
-              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 0, "invested_gold": 0},
-              "diana": {"player_id": "diana", "country_id": "Britannia", "stored_gold": 0, "invested_gold": 0},
-              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 0, "invested_gold": 0}
+              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
+              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
+              "diana": {"player_id": "diana", "country_id": "Britannia", "stored_gold": 5, "invested_gold": 0},
+              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 5, "invested_gold": 0}
             }
           }
         }
@@ -70,8 +70,8 @@
           "actions": [
             {"type": "tax_peasants_low", "player_id": "alice", "country_id": "Avalon"},
             {"type": "tax_peasants_high", "player_id": "alice", "country_id": "Avalon"},
-            {"type": "tax_merchants", "player_id": "alice", "country_id": "Avalon", "merchant_id": "charlie", "amount": "<AMOUNT:0-0>"},
-            {"type": "tax_merchants", "player_id": "alice", "country_id": "Avalon", "merchant_id": "eve", "amount": "<AMOUNT:0-0>"}
+            {"type": "tax_merchants", "player_id": "alice", "country_id": "Avalon", "merchant_id": "charlie", "amount": "<AMOUNT:0-5>"},
+            {"type": "tax_merchants", "player_id": "alice", "country_id": "Avalon", "merchant_id": "eve", "amount": "<AMOUNT:0-5>"}
           ]
         }
       },
@@ -134,7 +134,7 @@
                 "army_strength": 0,
                 "country_id": "Avalon",
                 "died_once": false,
-                "gold": 0,
+                "gold": 10,
                 "hp": 10,
                 "is_republic": false,
                 "monarch_id": "alice",
@@ -144,7 +144,7 @@
                 "army_strength": 0,
                 "country_id": "Britannia",
                 "died_once": false,
-                "gold": 0,
+                "gold": 10,
                 "hp": 10,
                 "is_republic": false,
                 "monarch_id": "bob",
@@ -156,25 +156,25 @@
                 "country_id": "Avalon",
                 "invested_gold": 0,
                 "player_id": "charlie",
-                "stored_gold": 0
+                "stored_gold": 5
               },
               "diana": {
                 "country_id": "Britannia",
                 "invested_gold": 0,
                 "player_id": "diana",
-                "stored_gold": 0
+                "stored_gold": 5
               },
               "eve": {
                 "country_id": "Avalon",
                 "invested_gold": 0,
                 "player_id": "eve",
-                "stored_gold": 0
+                "stored_gold": 5
               },
               "frank": {
                 "country_id": "Britannia",
                 "invested_gold": 0,
                 "player_id": "frank",
-                "stored_gold": 0
+                "stored_gold": 5
               }
             },
             "phase": "taxation",
@@ -194,14 +194,14 @@
             "turn": 1,
             "phase": "negotiation",
             "countries": {
-              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 0, "gold": 10, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-              "Britannia": {"country_id": "Britannia", "hp": 10, "army_strength": 0, "gold": 5, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
+              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 0, "gold": 20, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+              "Britannia": {"country_id": "Britannia", "hp": 10, "army_strength": 0, "gold": 15, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
             },
             "merchants": {
-              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
-              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
-              "diana": {"player_id": "diana", "country_id": "Britannia", "stored_gold": 5, "invested_gold": 0},
-              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 5, "invested_gold": 0}
+              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 0},
+              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 0},
+              "diana": {"player_id": "diana", "country_id": "Britannia", "stored_gold": 10, "invested_gold": 0},
+              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 10, "invested_gold": 0}
             }
           }
         }
@@ -217,14 +217,14 @@
             "turn": 1,
             "phase": "spending",
             "countries": {
-              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 0, "gold": 10, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-              "Britannia": {"country_id": "Britannia", "hp": 10, "army_strength": 0, "gold": 5, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
+              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 0, "gold": 20, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+              "Britannia": {"country_id": "Britannia", "hp": 10, "army_strength": 0, "gold": 15, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
             },
             "merchants": {
-              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
-              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
-              "diana": {"player_id": "diana", "country_id": "Britannia", "stored_gold": 5, "invested_gold": 0},
-              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 5, "invested_gold": 0}
+              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 0},
+              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 0},
+              "diana": {"player_id": "diana", "country_id": "Britannia", "stored_gold": 10, "invested_gold": 0},
+              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 10, "invested_gold": 0}
             }
           }
         }
@@ -236,7 +236,7 @@
           "player_id": "charlie",
           "phase": "spending",
           "actions": [
-            {"type": "merchant_invest", "player_id": "charlie", "merchant_id": "charlie", "amount": "<AMOUNT:0-5>"},
+            {"type": "merchant_invest", "player_id": "charlie", "merchant_id": "charlie", "amount": "<AMOUNT:0-10>"},
             {"type": "merchant_hide", "player_id": "charlie", "merchant_id": "charlie"}
           ]
         }
@@ -276,14 +276,14 @@
             "turn": 1,
             "phase": "war",
             "countries": {
-              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 8, "gold": 2, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-              "Britannia": {"country_id": "Britannia", "hp": 10, "army_strength": 3, "gold": 2, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
+              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 8, "gold": 12, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+              "Britannia": {"country_id": "Britannia", "hp": 10, "army_strength": 3, "gold": 12, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
             },
             "merchants": {
-              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 2, "invested_gold": 3},
-              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
-              "diana": {"player_id": "diana", "country_id": "Britannia", "stored_gold": 1, "invested_gold": 4},
-              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 3, "invested_gold": 2}
+              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 7, "invested_gold": 3},
+              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 0},
+              "diana": {"player_id": "diana", "country_id": "Britannia", "stored_gold": 6, "invested_gold": 4},
+              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 8, "invested_gold": 2}
             }
           }
         }
@@ -329,14 +329,14 @@
             "turn": 1,
             "phase": "assessment",
             "countries": {
-              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 4, "gold": 7, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-              "Britannia": {"country_id": "Britannia", "hp": 5, "army_strength": 1, "gold": 2, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
+              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 4, "gold": 17, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+              "Britannia": {"country_id": "Britannia", "hp": 5, "army_strength": 1, "gold": 12, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
             },
             "merchants": {
-              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 2, "invested_gold": 3},
-              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
-              "diana": {"player_id": "diana", "country_id": "Britannia", "stored_gold": 1, "invested_gold": 4},
-              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 3, "invested_gold": 2}
+              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 7, "invested_gold": 3},
+              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 0},
+              "diana": {"player_id": "diana", "country_id": "Britannia", "stored_gold": 6, "invested_gold": 4},
+              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 8, "invested_gold": 2}
             }
           }
         }
@@ -364,14 +364,14 @@
             "turn": 2,
             "phase": "taxation",
             "countries": {
-              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 4, "gold": 7, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-              "Britannia": {"country_id": "Britannia", "hp": 5, "army_strength": 1, "gold": 2, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
+              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 4, "gold": 17, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+              "Britannia": {"country_id": "Britannia", "hp": 5, "army_strength": 1, "gold": 12, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
             },
             "merchants": {
-              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 2, "invested_gold": 3},
-              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 0},
-              "diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 1, "invested_gold": 0},
-              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 3, "invested_gold": 2}
+              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 7, "invested_gold": 3},
+              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 0},
+              "diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 6, "invested_gold": 0},
+              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 8, "invested_gold": 2}
             }
           }
         }
@@ -398,14 +398,14 @@
             "turn": 2,
             "phase": "negotiation",
             "countries": {
-              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 4, "gold": 14, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-              "Britannia": {"country_id": "Britannia", "hp": 5, "army_strength": 1, "gold": 7, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
+              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 4, "gold": 24, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+              "Britannia": {"country_id": "Britannia", "hp": 5, "army_strength": 1, "gold": 17, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
             },
             "merchants": {
-              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 11, "invested_gold": 0},
-              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 0},
-              "diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 6, "invested_gold": 0},
-              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 12, "invested_gold": 0}
+              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 16, "invested_gold": 0},
+              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 15, "invested_gold": 0},
+              "diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 11, "invested_gold": 0},
+              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 17, "invested_gold": 0}
             }
           }
         }
@@ -421,14 +421,14 @@
             "turn": 2,
             "phase": "spending",
             "countries": {
-              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 4, "gold": 14, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-              "Britannia": {"country_id": "Britannia", "hp": 5, "army_strength": 1, "gold": 7, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
+              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 4, "gold": 24, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+              "Britannia": {"country_id": "Britannia", "hp": 5, "army_strength": 1, "gold": 17, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
             },
             "merchants": {
-              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 11, "invested_gold": 0},
-              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 0},
-              "diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 6, "invested_gold": 0},
-              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 12, "invested_gold": 0}
+              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 16, "invested_gold": 0},
+              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 15, "invested_gold": 0},
+              "diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 11, "invested_gold": 0},
+              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 17, "invested_gold": 0}
             }
           }
         }
@@ -458,14 +458,14 @@
             "turn": 2,
             "phase": "war",
             "countries": {
-              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 16, "gold": 2, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-              "Britannia": {"country_id": "Britannia", "hp": 5, "army_strength": 8, "gold": 0, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
+              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 16, "gold": 12, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+              "Britannia": {"country_id": "Britannia", "hp": 5, "army_strength": 8, "gold": 10, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": false}
             },
             "merchants": {
-              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 6, "invested_gold": 5},
-              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
-              "diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 3, "invested_gold": 3},
-              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 6, "invested_gold": 6}
+              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 11, "invested_gold": 5},
+              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 5},
+              "diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 8, "invested_gold": 3},
+              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 11, "invested_gold": 6}
             }
           }
         }
@@ -490,14 +490,14 @@
             "turn": 2,
             "phase": "assessment",
             "countries": {
-              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 8, "gold": 7, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-              "Britannia": {"country_id": "Britannia", "hp": 1, "army_strength": 4, "gold": 0, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": true}
+              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 8, "gold": 17, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+              "Britannia": {"country_id": "Britannia", "hp": 1, "army_strength": 4, "gold": 10, "peasants": 1, "is_republic": false, "monarch_id": "bob", "died_once": true}
             },
             "merchants": {
-              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 6, "invested_gold": 5},
-              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
-              "diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 3, "invested_gold": 3},
-              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 6, "invested_gold": 6}
+              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 11, "invested_gold": 5},
+              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 5},
+              "diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 8, "invested_gold": 3},
+              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 11, "invested_gold": 6}
             }
           }
         }
@@ -525,14 +525,14 @@
             "turn": 3,
             "phase": "taxation",
             "countries": {
-              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 8, "gold": 7, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-              "Britannia": {"country_id": "Britannia", "hp": -1, "army_strength": 4, "gold": 0, "peasants": 1, "is_republic": true, "monarch_id": "", "died_once": true}
+              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 8, "gold": 17, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+              "Britannia": {"country_id": "Britannia", "hp": -1, "army_strength": 4, "gold": 10, "peasants": 1, "is_republic": true, "monarch_id": "", "died_once": true}
             },
             "merchants": {
-              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 6, "invested_gold": 5},
-              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
-              "diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 3, "invested_gold": 3},
-              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 6, "invested_gold": 6}
+              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 11, "invested_gold": 5},
+              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 5},
+              "diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 8, "invested_gold": 3},
+              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 11, "invested_gold": 6}
             }
           }
         }
@@ -545,14 +545,14 @@
             "turn": 3,
             "phase": "taxation",
             "countries": {
-              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 8, "gold": 7, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
-              "Britannia": {"country_id": "Britannia", "hp": -1, "army_strength": 4, "gold": 0, "peasants": 1, "is_republic": true, "monarch_id": "", "died_once": true}
+              "Avalon": {"country_id": "Avalon", "hp": 10, "army_strength": 8, "gold": 17, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false},
+              "Britannia": {"country_id": "Britannia", "hp": -1, "army_strength": 4, "gold": 10, "peasants": 1, "is_republic": true, "monarch_id": "", "died_once": true}
             },
             "merchants": {
-              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 6, "invested_gold": 5},
-              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 5, "invested_gold": 5},
-              "diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 3, "invested_gold": 3},
-              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 6, "invested_gold": 6}
+              "charlie": {"player_id": "charlie", "country_id": "Avalon", "stored_gold": 11, "invested_gold": 5},
+              "eve": {"player_id": "eve", "country_id": "Avalon", "stored_gold": 10, "invested_gold": 5},
+              "diana": {"player_id": "diana", "country_id": "Avalon", "stored_gold": 8, "invested_gold": 3},
+              "frank": {"player_id": "frank", "country_id": "Britannia", "stored_gold": 11, "invested_gold": 6}
             }
           }
         }
@@ -592,10 +592,10 @@
             "turn": 1,
             "phase": "negotiation",
             "countries": {
-              "TestLand": {"country_id": "TestLand", "hp": 10, "army_strength": 0, "gold": 10, "peasants": 1, "is_republic": false, "monarch_id": "monarch1", "died_once": false}
+              "TestLand": {"country_id": "TestLand", "hp": 10, "army_strength": 0, "gold": 20, "peasants": 1, "is_republic": false, "monarch_id": "monarch1", "died_once": false}
             },
             "merchants": {
-              "merchant1": {"player_id": "merchant1", "country_id": "TestLand", "stored_gold": 5, "invested_gold": 0}
+              "merchant1": {"player_id": "merchant1", "country_id": "TestLand", "stored_gold": 10, "invested_gold": 0}
             }
           }
         }
@@ -611,10 +611,10 @@
             "turn": 1,
             "phase": "spending",
             "countries": {
-              "TestLand": {"country_id": "TestLand", "hp": 10, "army_strength": 0, "gold": 10, "peasants": 1, "is_republic": false, "monarch_id": "monarch1", "died_once": false}
+              "TestLand": {"country_id": "TestLand", "hp": 10, "army_strength": 0, "gold": 20, "peasants": 1, "is_republic": false, "monarch_id": "monarch1", "died_once": false}
             },
             "merchants": {
-              "merchant1": {"player_id": "merchant1", "country_id": "TestLand", "stored_gold": 5, "invested_gold": 0}
+              "merchant1": {"player_id": "merchant1", "country_id": "TestLand", "stored_gold": 10, "invested_gold": 0}
             }
           }
         }
@@ -634,11 +634,11 @@
         }
       },
       {
-        "comment": "Try to submit another build_army for 10 gold - should be rejected (only 10 total, 5 already pending)",
+        "comment": "Try to submit another build_army for 16 gold - should be rejected (only 20 total, 5 already pending)",
         "request": {
           "type": "submit",
           "actions": [
-            {"type": "build_army", "player_id": "monarch1", "country_id": "TestLand", "amount": 10}
+            {"type": "build_army", "player_id": "monarch1", "country_id": "TestLand", "amount": 16}
           ]
         },
         "expected": {
@@ -647,8 +647,8 @@
           "phase": "spending",
           "rejected_actions": [
             {
-              "action": {"type": "build_army", "player_id": "monarch1", "country_id": "TestLand", "amount": 10},
-              "reason": "insufficient gold: trying to spend 15 but only have 10 (including pending actions)"
+              "action": {"type": "build_army", "player_id": "monarch1", "country_id": "TestLand", "amount": 16},
+              "reason": "insufficient gold: trying to spend 21 but only have 20 (including pending actions)"
             }
           ]
         }
@@ -675,10 +675,10 @@
             "turn": 1,
             "phase": "war",
             "countries": {
-              "TestLand": {"country_id": "TestLand", "hp": 10, "army_strength": 5, "gold": 5, "peasants": 1, "is_republic": false, "monarch_id": "monarch1", "died_once": false}
+              "TestLand": {"country_id": "TestLand", "hp": 10, "army_strength": 5, "gold": 15, "peasants": 1, "is_republic": false, "monarch_id": "monarch1", "died_once": false}
             },
             "merchants": {
-              "merchant1": {"player_id": "merchant1", "country_id": "TestLand", "stored_gold": 5, "invested_gold": 0}
+              "merchant1": {"player_id": "merchant1", "country_id": "TestLand", "stored_gold": 10, "invested_gold": 0}
             }
           }
         }
@@ -733,11 +733,11 @@
             "turn": 1,
             "phase": "assessment",
             "countries": {
-              "TestLand": {"country_id": "TestLand", "hp": 10, "army_strength": 2, "gold": 10, "peasants": 1, "is_republic": false, "monarch_id": "monarch1", "died_once": false},
-              "Enemy": {"country_id": "Enemy", "hp": 5, "army_strength": 0, "gold": 0, "peasants": 1, "is_republic": false, "monarch_id": "enemy1", "died_once": false}
+              "TestLand": {"country_id": "TestLand", "hp": 10, "army_strength": 2, "gold": 20, "peasants": 1, "is_republic": false, "monarch_id": "monarch1", "died_once": false},
+              "Enemy": {"country_id": "Enemy", "hp": 5, "army_strength": 0, "gold": 10, "peasants": 1, "is_republic": false, "monarch_id": "enemy1", "died_once": false}
             },
             "merchants": {
-              "merchant1": {"player_id": "merchant1", "country_id": "TestLand", "stored_gold": 5, "invested_gold": 0}
+              "merchant1": {"player_id": "merchant1", "country_id": "TestLand", "stored_gold": 10, "invested_gold": 0}
             }
           }
         }
@@ -785,11 +785,11 @@
             "phase": "taxation",
             "turn": 2,
             "countries": {
-              "TestLand": {"country_id": "TestLand", "monarch_id": "monarch1", "gold": 10, "army_strength": 2, "hp": 10, "peasants": 1, "is_republic": false, "died_once": false},
-              "Enemy": {"country_id": "Enemy", "monarch_id": "enemy1", "gold": 0, "army_strength": 0, "hp": 5, "peasants": 1, "is_republic": false, "died_once": false}
+              "TestLand": {"country_id": "TestLand", "monarch_id": "monarch1", "gold": 20, "army_strength": 2, "hp": 10, "peasants": 1, "is_republic": false, "died_once": false},
+              "Enemy": {"country_id": "Enemy", "monarch_id": "enemy1", "gold": 10, "army_strength": 0, "hp": 5, "peasants": 1, "is_republic": false, "died_once": false}
             },
             "merchants": {
-              "merchant1": {"player_id": "merchant1", "country_id": "TestLand", "stored_gold": 5, "invested_gold": 0}
+              "merchant1": {"player_id": "merchant1", "country_id": "TestLand", "stored_gold": 10, "invested_gold": 0}
             }
           },
           "events": [],

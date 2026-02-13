@@ -18,7 +18,7 @@ func NewCountry(id string, monarchID string) *Country {
 		ID:           id,
 		HP:           10,
 		ArmyStrength: 0,
-		Gold:         0,
+		Gold:         10,
 		Peasants:     1,
 		IsRepublic:   false,
 		MonarchID:    monarchID,

@@ -13,7 +13,7 @@ func NewMerchant(id string, countryID string) *Merchant {
 	return &Merchant{
 		ID:           id,
 		CountryID:    countryID,
-		StoredGold:   0,
+		StoredGold:   5,
 		InvestedGold: 0,
 	}
 }
