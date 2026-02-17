@@ -39,7 +39,7 @@ func (p *SpendingPhase) ValidActions(state *engine.GameState, playerID string) [
 			for _, merchant := range state.GetMerchantsByCountry(country.ID) {
 				if country.Gold > 0 {
 					validActions = append(validActions,
-						actions.NewMonarchInvestAction(playerID, country.ID, merchant.ID, 0),
+						actions.NewMonarchInvestAction(playerID, country.ID, merchant.ID, country.Gold),
 					)
 				}
 			}

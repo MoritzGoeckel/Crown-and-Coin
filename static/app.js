@@ -731,6 +731,8 @@ function formatActionLabel(action) {
             return `Tax ${action.merchant_id}`;
         case 'merchant_invest':
             return 'Invest';
+        case 'monarch_invest':
+            return `Invest in ${action.merchant_id}`;
         case 'build_army':
             return 'Build Army';
         default:
@@ -750,6 +752,8 @@ function formatAction(action) {
             return `Build Army (${action.amount})`;
         case 'merchant_invest':
             return `Invest ${action.amount}`;
+        case 'monarch_invest':
+            return `Invest ${action.amount} in ${action.merchant_id}`;
         case 'merchant_hide':
             return 'Hide Gold';
         case 'attack':
