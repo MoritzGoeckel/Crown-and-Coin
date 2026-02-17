@@ -66,7 +66,24 @@ The websocket messages follow that patter:
 - [x] History of actions should be shown
 - [x] Save history of actions / states
 
-# frontend
+# To test
+
+- [x] show monarch_invest action as something nice and ther should be a name of a player and the up/down buttons don't work. It always gets reset to 0. Zero is valid, others don't show (even no rejection)
+- [x] Maybe should reject invest with 0
+- [x] Tax merchants with too much money should make error message
+- [x] The actions in the player interface should always be sorted alphabetically
+- [x] Merchant gold is not calculated correctly after taxation see scenarios.json
+- [x] After round, when next round starts with taxation 
+    -> Merchants should get 5
+    -> Investment should double
+- [x] Printing history into file should be phase, state, actions ...
+- [x] Try overtaxing a merchant
+
+- [x] Test if high taxation leads to a revolt (-2 hp)
+
+- [x] Try out fleeing
+- [x] Merchant revolt works
+
 ## new features
 
 - [ ] New game
@@ -76,33 +93,25 @@ The websocket messages follow that patter:
     - Only monarchs and merchants
     - Does not do anything
 
-## bugs
-
-- [/] show monarch_invest action as something nice and ther should be a name of a player and the up/down buttons don't work. It always gets reset to 0. Zero is valid, others don't show (even no rejection)
-
-- [/] Maybe should reject invest with 0
-- [/] Tax merchants with too much money should make error message
-- [/] The actions in the player interface should always be sorted alphabetically
-- [/] Try out fleeing
-
-# engine
-
-## new features
-
 - [ ] Cancel pending actions as player
+
 - [ ] Add republic voting - Extend actions for merchant republics
 
 ## bugs
 
-- [/] Merchant gold is not calculated correctly after taxation see scenarios.json
-- [/] Test if high taxation leads to a revolt (-2 hp)
-- [/] After round, when next round starts with taxation 
-    -> Merchants should get 5
-    -> Investment should double
+- [ ] Remove this 'end of turn 1 - taxation' thing from history in frontend
+
+- [ ] Not everybody should have the same peasant revolt
+
+- [ ] Disable advance phase button for 5 seconds after clicking
+
+- [ ] Monarch should only be able to attack one country
+
+- [ ] A country should not die in a attack in one round when multiple countries attack it
+
+- [ ] When killing a country all participants share the peasants and merchants
 
 # Misc
-
-- [ ] Printing history into file should be phase, state, actions ...
 
 Unique names for players?
 
