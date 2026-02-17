@@ -73,5 +73,17 @@ func (p *WarPhase) Execute(state *engine.GameState, playerActions []actions.Acti
 		}
 	}
 
+	// End of turn: pay out investments and give all merchants income
+	for _, merchant := range newState.Merchants {
+		if merchant.InvestedGold > 0 {
+			payout := merchant.CollectInvestment()
+			allEvents = append(allEvents, events.NewInvestmentPayoutEvent(merchant.ID, payout))
+		}
+	}
+	for _, merchant := range newState.Merchants {
+		merchant.ReceiveIncome(5)
+		allEvents = append(allEvents, events.NewMerchantIncomeEvent(merchant.ID, 5))
+	}
+
 	return newState, allEvents
 }

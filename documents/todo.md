@@ -67,25 +67,35 @@ The websocket messages follow that patter:
 - [x] Save history of actions / states
 
 # frontend
+## new features
+
+- [ ] New game
+- [ ] Save game, so can continue after program restart (game state, history)
+
+## bugs
 
 - [ ] Remove players does not work
     - Only monarchs and merchants
     - Does not do anything
-- [ ] New game
-- [ ] Save game, so can continue after program restart (game state, history)
+
 - [ ] show monarch_invest action as something nice and ther should be a name of a player and the up/down buttons don't work. It always gets reset to 0. Zero is valid, others don't show (even no rejection)
 - [ ] Maybe should reject invest with 0
 - [ ] Tax merchants with too much money should make error message
 - [ ] The actions in the player interface should always be sorted alphabetically
 
 # engine
+## new features
+
 - [ ] Cancel pending actions as player
+- [ ] Add republic voting - Extend actions for merchant republics
+
+## bugs
+
 - [ ] Merchant gold is not calculated correctly after taxation see scenarios.json
 - [ ] Test if high taxation leads to a revolt (-2 hp)
 - [ ] After round, when next round starts with taxation 
     -> Merchants should get 5
     -> Investment should double
-- [ ] Add republic voting - Extend actions for merchant republics
 
 # Misc
 

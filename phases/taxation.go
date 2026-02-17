@@ -51,21 +51,7 @@ func (p *TaxationPhase) Execute(state *engine.GameState, playerActions []actions
 	newState := state.Clone()
 	var allEvents []events.Event
 
-	// First: Pay out investments from previous turn to all merchants
-	for _, merchant := range newState.Merchants {
-		if merchant.InvestedGold > 0 {
-			payout := merchant.CollectInvestment()
-			allEvents = append(allEvents, events.NewInvestmentPayoutEvent(merchant.ID, payout))
-		}
-	}
-
-	// Second: All merchants receive 5 gold income
-	for _, merchant := range newState.Merchants {
-		merchant.ReceiveIncome(5)
-		allEvents = append(allEvents, events.NewMerchantIncomeEvent(merchant.ID, 5))
-	}
-
-	// Third: Process monarch tax actions
+	// Process monarch tax actions
 	// Group actions by country to handle peasant revolt at end of phase
 	revoltChecks := make(map[string]bool) // countryID -> had high tax
 
