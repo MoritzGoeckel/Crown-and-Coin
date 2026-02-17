@@ -584,6 +584,8 @@ function renderActions(actions) {
         return;
     }
 
+    actions = [...actions].sort((a, b) => formatActionLabel(a).localeCompare(formatActionLabel(b)));
+
     actions.forEach(action => {
         const range = parseAmountRange(action.amount);
 

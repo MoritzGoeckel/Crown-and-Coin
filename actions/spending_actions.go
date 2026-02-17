@@ -89,8 +89,8 @@ func (a *MonarchInvestAction) Validate(state *engine.GameState) error {
 	if merchant.CountryID != a.CountryID {
 		return errors.New("merchant does not belong to this country")
 	}
-	if a.Amount < 0 {
-		return errors.New("amount cannot be negative")
+	if a.Amount <= 0 {
+		return errors.New("amount must be greater than zero")
 	}
 	if country.Gold < a.Amount {
 		return errors.New("insufficient gold")
@@ -140,8 +140,8 @@ func (a *MerchantInvestAction) Validate(state *engine.GameState) error {
 	if merchant.ID != a.playerID {
 		return errors.New("can only invest your own gold")
 	}
-	if a.Amount < 0 {
-		return errors.New("amount cannot be negative")
+	if a.Amount <= 0 {
+		return errors.New("amount must be greater than zero")
 	}
 	if merchant.StoredGold < a.Amount {
 		return errors.New("insufficient stored gold")
