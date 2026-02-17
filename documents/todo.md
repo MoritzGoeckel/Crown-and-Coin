@@ -97,6 +97,13 @@ The websocket messages follow that patter:
 
 - [ ] Add republic voting - Extend actions for merchant republics
 
+- [ ] change peasants to 5
+- [ ] taxation should be 2 gold or 1 gold per peasant
+
+- [ ] Republic: Vote on hi/lo taxation and war. Most votes option wins.
+    - [ ] Money goes from peasants directly to merchants
+    - [ ] Merchants invest into army themselve
+
 ## bugs
 
 - [ ] Remove this 'end of turn 1 - taxation' thing from history in frontend
