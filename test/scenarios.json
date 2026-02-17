@@ -658,6 +658,42 @@
     ]
   },
   {
+    "name": "High taxation revolt test",
+    "seed": 0,
+    "steps": [
+      {
+        "request": {"type": "add_country", "country_id": "Avalon", "monarch_id": "alice"},
+        "expected": {"success": true}
+      },
+      {
+        "comment": "Submit high tax - with seed 0, first d6 roll = 1 (<=2), revolt triggered",
+        "request": {
+          "type": "submit",
+          "action": {"type": "tax_peasants_high", "player_id": "alice", "country_id": "Avalon"}
+        },
+        "expected": {"success": true, "action": {"type": "tax_peasants_high", "player_id": "alice", "country_id": "Avalon"}}
+      },
+      {
+        "comment": "Advance: revolt deals -2 HP (10 -> 8), high tax gold +10 (10 -> 20)",
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "previous_phase": "taxation",
+          "current_phase": "negotiation",
+          "turn": 1,
+          "state": {
+            "turn": 1,
+            "phase": "negotiation",
+            "countries": {
+              "Avalon": {"country_id": "Avalon", "hp": 8, "army_strength": 0, "gold": 20, "peasants": 1, "is_republic": false, "monarch_id": "alice", "died_once": false}
+            },
+            "merchants": {}
+          }
+        }
+      }
+    ]
+  },
+  {
     "name": "Action conflict validation tests",
     "seed": 54321,
     "steps": [

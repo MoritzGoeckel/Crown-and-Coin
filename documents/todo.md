@@ -79,6 +79,7 @@ The websocket messages follow that patter:
     - Does not do anything
 
 - [ ] show monarch_invest action as something nice and ther should be a name of a player and the up/down buttons don't work. It always gets reset to 0. Zero is valid, others don't show (even no rejection)
+
 - [ ] Maybe should reject invest with 0
 - [ ] Tax merchants with too much money should make error message
 - [ ] The actions in the player interface should always be sorted alphabetically
@@ -91,9 +92,9 @@ The websocket messages follow that patter:
 
 ## bugs
 
-- [ ] Merchant gold is not calculated correctly after taxation see scenarios.json
+- [/] Merchant gold is not calculated correctly after taxation see scenarios.json
 - [ ] Test if high taxation leads to a revolt (-2 hp)
-- [ ] After round, when next round starts with taxation 
+- [/] After round, when next round starts with taxation 
     -> Merchants should get 5
     -> Investment should double
 
