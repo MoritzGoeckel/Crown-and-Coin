@@ -625,6 +625,11 @@ function renderActions(actions) {
                 if (!isNaN(amount) && amount >= range.min && amount <= range.max) {
                     const submitAction = { ...action, amount };
                     send({ type: 'submit', action: submitAction });
+                } else {
+                    renderRejectedActions([{
+                        action: action,
+                        reason: `Amount must be between ${range.min} and ${range.max}`
+                    }]);
                 }
             });
 

@@ -85,6 +85,7 @@ The websocket messages follow that patter:
 - [ ] The actions in the player interface should always be sorted alphabetically
 
 # engine
+
 ## new features
 
 - [ ] Cancel pending actions as player
@@ -93,7 +94,7 @@ The websocket messages follow that patter:
 ## bugs
 
 - [/] Merchant gold is not calculated correctly after taxation see scenarios.json
-- [ ] Test if high taxation leads to a revolt (-2 hp)
+- [/] Test if high taxation leads to a revolt (-2 hp)
 - [/] After round, when next round starts with taxation 
     -> Merchants should get 5
     -> Investment should double
