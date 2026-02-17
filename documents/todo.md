@@ -72,17 +72,18 @@ The websocket messages follow that patter:
 - [ ] New game
 - [ ] Save game, so can continue after program restart (game state, history)
 
-## bugs
-
 - [ ] Remove players does not work
     - Only monarchs and merchants
     - Does not do anything
 
-- [ ] show monarch_invest action as something nice and ther should be a name of a player and the up/down buttons don't work. It always gets reset to 0. Zero is valid, others don't show (even no rejection)
+## bugs
+
+- [/] show monarch_invest action as something nice and ther should be a name of a player and the up/down buttons don't work. It always gets reset to 0. Zero is valid, others don't show (even no rejection)
 
 - [/] Maybe should reject invest with 0
 - [/] Tax merchants with too much money should make error message
 - [/] The actions in the player interface should always be sorted alphabetically
+- [/] Try out fleeing
 
 # engine
 

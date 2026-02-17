@@ -274,25 +274,25 @@ func (s *Server) getHistoryForPlayer() interface{} {
 	}
 }
 
-func (s *Server) saveHistoryToMarkdown() error {
+func (s *Server) saveHistoryToMarkdown() {
 	s.historyMu.RLock()
 	defer s.historyMu.RUnlock()
 
 	filename := s.history.GameName + ".md"
 	f, err := os.Create(filename)
 	if err != nil {
-		return err
+		log.Printf("Failed to create history file: %v", err)
+		return
 	}
 	defer f.Close()
 
 	fmt.Fprintf(f, "# Game History: %s\n\n", s.history.GameName)
 
-	// Write state snapshots
-	fmt.Fprintf(f, "## Game States by Phase\n\n")
 	for _, snapshot := range s.history.StateSnapshots {
-		fmt.Fprintf(f, "### Turn %d - %s\n", snapshot.Turn, snapshot.Phase)
-		fmt.Fprintf(f, "*Recorded at: %s*\n\n", snapshot.Timestamp.Format("15:04:05"))
+		fmt.Fprintf(f, "## Turn %d - %s\n\n", snapshot.Turn, snapshot.Phase)
 
+		// State
+		fmt.Fprintf(f, "### State\n\n")
 		if snapshot.State != nil {
 			fmt.Fprintf(f, "#### Countries\n")
 			for _, country := range snapshot.State.Countries {
@@ -304,34 +304,34 @@ func (s *Server) saveHistoryToMarkdown() error {
 					country.CountryID, status, country.HP, country.Gold,
 					country.ArmyStrength, country.Peasants)
 			}
-
 			fmt.Fprintf(f, "\n#### Merchants\n")
 			for _, merchant := range snapshot.State.Merchants {
 				fmt.Fprintf(f, "- **%s** in %s: Stored=%d, Invested=%d\n",
 					merchant.PlayerID, merchant.CountryID,
 					merchant.StoredGold, merchant.InvestedGold)
 			}
-		}
-		fmt.Fprintf(f, "\n")
-	}
-
-	// Write action history
-	fmt.Fprintf(f, "## Action History\n\n")
-	currentPhase := ""
-	for _, entry := range s.history.Actions {
-		phaseKey := fmt.Sprintf("Turn %d - %s", entry.Turn, entry.Phase)
-		if phaseKey != currentPhase {
-			currentPhase = phaseKey
-			fmt.Fprintf(f, "### %s\n\n", currentPhase)
+			fmt.Fprintf(f, "\n")
 		}
 
-		actionDesc := formatActionForMarkdown(entry.Action)
-		fmt.Fprintf(f, "- **%s**: %s (%s)\n", entry.PlayerID, actionDesc,
-			entry.Timestamp.Format("15:04:05"))
+		// Actions for this phase
+		fmt.Fprintf(f, "### Actions\n\n")
+		phaseKey := fmt.Sprintf("%d-%s", snapshot.Turn, snapshot.Phase)
+		hasActions := false
+		for _, entry := range s.history.Actions {
+			if fmt.Sprintf("%d-%s", entry.Turn, entry.Phase) == phaseKey {
+				fmt.Fprintf(f, "- **%s**: %s (%s)\n", entry.PlayerID,
+					formatActionForMarkdown(entry.Action),
+					entry.Timestamp.Format("15:04:05"))
+				hasActions = true
+			}
+		}
+		if !hasActions {
+			fmt.Fprintf(f, "*No actions this phase.*\n")
+		}
+		fmt.Fprintf(f, "\n---\n\n")
 	}
 
 	log.Printf("Game history saved to %s", filename)
-	return nil
 }
 
 func formatActionForMarkdown(action jsonapi.ActionJSON) string {
@@ -461,6 +461,11 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 		// Handle advance separately to record state snapshot
 		if msgType.Type == "advance" {
+			// Capture the old phase/turn before advancing so the snapshot matches the actions
+			oldEngineState := s.api.GetEngine().GetState()
+			oldPhase := oldEngineState.Phase.String()
+			oldTurn := oldEngineState.Turn
+
 			response, err := s.api.ProcessMessage(clientMsg.Payload)
 			if err != nil {
 				log.Printf("Engine error: %v", err)
@@ -474,11 +479,11 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 				State   *jsonapi.StateJSON `json:"state"`
 			}
 			if err := json.Unmarshal(response, &advanceResp); err == nil && advanceResp.Success {
-				// Record state snapshot
+				// Record snapshot keyed to the phase that just ended
 				s.historyMu.Lock()
 				snapshot := StateSnapshot{
-					Turn:      advanceResp.State.Turn,
-					Phase:     advanceResp.State.Phase,
+					Turn:      oldTurn,
+					Phase:     oldPhase,
 					State:     advanceResp.State,
 					Timestamp: time.Now(),
 				}
