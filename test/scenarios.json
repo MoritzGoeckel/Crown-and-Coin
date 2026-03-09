@@ -1023,5 +1023,238 @@
         "expected": {"success": false, "error": "player_id is required", "removed": 0}
       }
     ]
+  },
+  {
+    "name": "Two countries attack one with 3 merchants",
+    "seed": 99999,
+    "steps": [
+      {
+        "request": {"type": "add_country", "country_id": "Kingdom", "monarch_id": "king"},
+        "expected": {"success": true}
+      },
+      {
+        "request": {"type": "add_country", "country_id": "Northland", "monarch_id": "nord"},
+        "expected": {"success": true}
+      },
+      {
+        "request": {"type": "add_country", "country_id": "Southland", "monarch_id": "south"},
+        "expected": {"success": true}
+      },
+      {
+        "request": {"type": "add_merchant", "player_id": "m1", "country_id": "Kingdom"},
+        "expected": {"success": true}
+      },
+      {
+        "request": {"type": "add_merchant", "player_id": "m2", "country_id": "Kingdom"},
+        "expected": {"success": true}
+      },
+      {
+        "request": {"type": "add_merchant", "player_id": "m3", "country_id": "Kingdom"},
+        "expected": {"success": true}
+      },
+      {
+        "comment": "Verify initial state",
+        "request": {"type": "get_state"},
+        "expected": {
+          "success": true,
+          "state": {
+            "turn": 1,
+            "phase": "taxation",
+            "countries": {
+              "Kingdom": {"country_id": "Kingdom", "hp": 10, "army_strength": 0, "gold": 10, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "king", "died_once": false},
+              "Northland": {"country_id": "Northland", "hp": 10, "army_strength": 0, "gold": 10, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "nord", "died_once": false},
+              "Southland": {"country_id": "Southland", "hp": 10, "army_strength": 0, "gold": 10, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "south", "died_once": false}
+            },
+            "merchants": {
+              "m1": {"player_id": "m1", "country_id": "Kingdom", "stored_gold": 5, "invested_gold": 0},
+              "m2": {"player_id": "m2", "country_id": "Kingdom", "stored_gold": 5, "invested_gold": 0},
+              "m3": {"player_id": "m3", "country_id": "Kingdom", "stored_gold": 5, "invested_gold": 0}
+            }
+          }
+        }
+      },
+      {
+        "comment": "Taxation: all monarchs tax low (+5 gold each)",
+        "request": {
+          "type": "submit",
+          "action": {"type": "tax_peasants_low", "player_id": "king", "country_id": "Kingdom"}
+        },
+        "expected": {"success": true, "action": {"type": "tax_peasants_low", "player_id": "king", "country_id": "Kingdom"}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "tax_peasants_low", "player_id": "nord", "country_id": "Northland"}
+        },
+        "expected": {"success": true, "action": {"type": "tax_peasants_low", "player_id": "nord", "country_id": "Northland"}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "tax_peasants_low", "player_id": "south", "country_id": "Southland"}
+        },
+        "expected": {"success": true, "action": {"type": "tax_peasants_low", "player_id": "south", "country_id": "Southland"}}
+      },
+      {
+        "comment": "Advance taxation -> negotiation",
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "previous_phase": "taxation",
+          "current_phase": "negotiation",
+          "turn": 1,
+          "state": {
+            "turn": 1,
+            "phase": "negotiation",
+            "countries": {
+              "Kingdom": {"country_id": "Kingdom", "hp": 10, "army_strength": 0, "gold": 15, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "king", "died_once": false},
+              "Northland": {"country_id": "Northland", "hp": 10, "army_strength": 0, "gold": 15, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "nord", "died_once": false},
+              "Southland": {"country_id": "Southland", "hp": 10, "army_strength": 0, "gold": 15, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "south", "died_once": false}
+            },
+            "merchants": {
+              "m1": {"player_id": "m1", "country_id": "Kingdom", "stored_gold": 5, "invested_gold": 0},
+              "m2": {"player_id": "m2", "country_id": "Kingdom", "stored_gold": 5, "invested_gold": 0},
+              "m3": {"player_id": "m3", "country_id": "Kingdom", "stored_gold": 5, "invested_gold": 0}
+            }
+          }
+        }
+      },
+      {
+        "comment": "Advance negotiation -> spending",
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "previous_phase": "negotiation",
+          "current_phase": "spending",
+          "turn": 1,
+          "state": {
+            "turn": 1,
+            "phase": "spending",
+            "countries": {
+              "Kingdom": {"country_id": "Kingdom", "hp": 10, "army_strength": 0, "gold": 15, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "king", "died_once": false},
+              "Northland": {"country_id": "Northland", "hp": 10, "army_strength": 0, "gold": 15, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "nord", "died_once": false},
+              "Southland": {"country_id": "Southland", "hp": 10, "army_strength": 0, "gold": 15, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "south", "died_once": false}
+            },
+            "merchants": {
+              "m1": {"player_id": "m1", "country_id": "Kingdom", "stored_gold": 5, "invested_gold": 0},
+              "m2": {"player_id": "m2", "country_id": "Kingdom", "stored_gold": 5, "invested_gold": 0},
+              "m3": {"player_id": "m3", "country_id": "Kingdom", "stored_gold": 5, "invested_gold": 0}
+            }
+          }
+        }
+      },
+      {
+        "comment": "Spending: Northland builds army 10",
+        "request": {
+          "type": "submit",
+          "action": {"type": "build_army", "player_id": "nord", "country_id": "Northland", "amount": 10}
+        },
+        "expected": {"success": true, "action": {"type": "build_army", "player_id": "nord", "country_id": "Northland", "amount": 10}}
+      },
+      {
+        "comment": "Spending: Southland builds army 10",
+        "request": {
+          "type": "submit",
+          "action": {"type": "build_army", "player_id": "south", "country_id": "Southland", "amount": 10}
+        },
+        "expected": {"success": true, "action": {"type": "build_army", "player_id": "south", "country_id": "Southland", "amount": 10}}
+      },
+      {
+        "comment": "Spending: Kingdom builds army 3",
+        "request": {
+          "type": "submit",
+          "action": {"type": "build_army", "player_id": "king", "country_id": "Kingdom", "amount": 3}
+        },
+        "expected": {"success": true, "action": {"type": "build_army", "player_id": "king", "country_id": "Kingdom", "amount": 3}}
+      },
+      {
+        "comment": "Spending: m1 invests 3",
+        "request": {
+          "type": "submit",
+          "action": {"type": "merchant_invest", "player_id": "m1", "merchant_id": "m1", "amount": 3}
+        },
+        "expected": {"success": true, "action": {"type": "merchant_invest", "player_id": "m1", "merchant_id": "m1", "amount": 3}}
+      },
+      {
+        "comment": "Spending: m2 hides",
+        "request": {
+          "type": "submit",
+          "action": {"type": "merchant_hide", "player_id": "m2", "merchant_id": "m2"}
+        },
+        "expected": {"success": true, "action": {"type": "merchant_hide", "player_id": "m2", "merchant_id": "m2"}}
+      },
+      {
+        "comment": "Spending: m3 invests 2",
+        "request": {
+          "type": "submit",
+          "action": {"type": "merchant_invest", "player_id": "m3", "merchant_id": "m3", "amount": 2}
+        },
+        "expected": {"success": true, "action": {"type": "merchant_invest", "player_id": "m3", "merchant_id": "m3", "amount": 2}}
+      },
+      {
+        "comment": "Advance spending -> war",
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "previous_phase": "spending",
+          "current_phase": "war",
+          "turn": 1,
+          "state": {
+            "turn": 1,
+            "phase": "war",
+            "countries": {
+              "Kingdom": {"country_id": "Kingdom", "hp": 10, "army_strength": 3, "gold": 12, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "king", "died_once": false},
+              "Northland": {"country_id": "Northland", "hp": 10, "army_strength": 10, "gold": 5, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "nord", "died_once": false},
+              "Southland": {"country_id": "Southland", "hp": 10, "army_strength": 10, "gold": 5, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "south", "died_once": false}
+            },
+            "merchants": {
+              "m1": {"player_id": "m1", "country_id": "Kingdom", "stored_gold": 2, "invested_gold": 3},
+              "m2": {"player_id": "m2", "country_id": "Kingdom", "stored_gold": 5, "invested_gold": 0},
+              "m3": {"player_id": "m3", "country_id": "Kingdom", "stored_gold": 3, "invested_gold": 2}
+            }
+          }
+        }
+      },
+      {
+        "comment": "War: Northland attacks Kingdom",
+        "request": {
+          "type": "submit",
+          "action": {"type": "attack", "player_id": "nord", "country_id": "Northland", "target_id": "Kingdom"}
+        },
+        "expected": {"success": true, "action": {"type": "attack", "player_id": "nord", "country_id": "Northland", "target_id": "Kingdom"}}
+      },
+      {
+        "comment": "War: Southland attacks Kingdom",
+        "request": {
+          "type": "submit",
+          "action": {"type": "attack", "player_id": "south", "country_id": "Southland", "target_id": "Kingdom"}
+        },
+        "expected": {"success": true, "action": {"type": "attack", "player_id": "south", "country_id": "Southland", "target_id": "Kingdom"}}
+      },
+      {
+        "comment": "Advance war -> assessment (resolve battles: Kingdom takes 14 damage, revives with 1 HP)",
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "previous_phase": "war",
+          "current_phase": "assessment",
+          "turn": 1,
+          "state": {
+            "turn": 1,
+            "phase": "assessment",
+            "countries": {
+              "Kingdom": {"country_id": "Kingdom", "hp": 1, "army_strength": 1, "gold": 12, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "king", "died_once": true},
+              "Northland": {"country_id": "Northland", "hp": 10, "army_strength": 5, "gold": 10, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "nord", "died_once": false},
+              "Southland": {"country_id": "Southland", "hp": 10, "army_strength": 5, "gold": 10, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "south", "died_once": false}
+            },
+            "merchants": {
+              "m1": {"player_id": "m1", "country_id": "Kingdom", "stored_gold": 13, "invested_gold": 0},
+              "m2": {"player_id": "m2", "country_id": "Kingdom", "stored_gold": 10, "invested_gold": 0},
+              "m3": {"player_id": "m3", "country_id": "Kingdom", "stored_gold": 12, "invested_gold": 0}
+            }
+          }
+        }
+      }
+    ]
   }
 ]

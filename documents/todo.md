@@ -110,8 +110,6 @@ The websocket messages follow that patter:
 - [ ] New game
 - [ ] Save game, so can continue after program restart (game state, history)
 
-- [/] Cancel pending actions as player
-
 - [ ] Add republic voting - Extend actions for merchant republics
 - [ ] Republic: Vote on hi/lo taxation and war. Most votes option wins.
     - [ ] Money goes from peasants directly to merchants
@@ -123,6 +121,13 @@ The websocket messages follow that patter:
     - [/] make it visible
 
 - [/] When killing a country all participants share the peasants and merchants
+
+- [/] remove End of Turn 1 in 'game history'
+
+- [/] Cancel pending actions as player
+
+- [ ] distribution of peasants and merchants
+- [ ] What if a country dies from a revolt
 
 # Misc
 
