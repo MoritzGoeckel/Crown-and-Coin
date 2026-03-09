@@ -1500,5 +1500,381 @@
         }
       }
     ]
+  },
+  {
+    "name": "High tax revolt kills country",
+    "seed": 42,
+    "steps": [
+      {
+        "comment": "Setup: 2 countries, 1 merchant in victim country",
+        "request": {"type": "add_country", "country_id": "Tyranny", "monarch_id": "tyrant"},
+        "expected": {"success": true}
+      },
+      {
+        "request": {"type": "add_country", "country_id": "Warland", "monarch_id": "general"},
+        "expected": {"success": true}
+      },
+      {
+        "request": {"type": "add_merchant", "player_id": "trader", "country_id": "Tyranny"},
+        "expected": {"success": true}
+      },
+
+      {
+        "comment": "=== ROUND 1 === Taxation: tyrant taxes high (roll=6 > risk=2, succeeds), general taxes low",
+        "request": {
+          "type": "submit",
+          "action": {"type": "tax_peasants_high", "player_id": "tyrant", "country_id": "Tyranny"}
+        },
+        "expected": {"success": true, "action": {"type": "tax_peasants_high", "player_id": "tyrant", "country_id": "Tyranny"}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "tax_peasants_low", "player_id": "general", "country_id": "Warland"}
+        },
+        "expected": {"success": true, "action": {"type": "tax_peasants_low", "player_id": "general", "country_id": "Warland"}}
+      },
+      {
+        "comment": "Advance taxation -> negotiation (high tax succeeds: +10 gold, risk 2->3)",
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "previous_phase": "taxation",
+          "current_phase": "negotiation",
+          "turn": 1,
+          "state": {
+            "turn": 1,
+            "phase": "negotiation",
+            "countries": {
+              "Tyranny": {"country_id": "Tyranny", "hp": 10, "army_strength": 0, "gold": 20, "peasants": 5, "revolt_risk": 3, "is_republic": false, "monarch_id": "tyrant", "died_once": false},
+              "Warland": {"country_id": "Warland", "hp": 10, "army_strength": 0, "gold": 15, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "general", "died_once": false}
+            },
+            "merchants": {
+              "trader": {"player_id": "trader", "country_id": "Tyranny", "stored_gold": 5, "invested_gold": 0}
+            }
+          }
+        }
+      },
+      {
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "previous_phase": "negotiation",
+          "current_phase": "spending",
+          "turn": 1,
+          "state": {
+            "turn": 1,
+            "phase": "spending",
+            "countries": {
+              "Tyranny": {"country_id": "Tyranny", "hp": 10, "army_strength": 0, "gold": 20, "peasants": 5, "revolt_risk": 3, "is_republic": false, "monarch_id": "tyrant", "died_once": false},
+              "Warland": {"country_id": "Warland", "hp": 10, "army_strength": 0, "gold": 15, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "general", "died_once": false}
+            },
+            "merchants": {
+              "trader": {"player_id": "trader", "country_id": "Tyranny", "stored_gold": 5, "invested_gold": 0}
+            }
+          }
+        }
+      },
+      {
+        "comment": "Spending: Warland builds army 5, trader hides",
+        "request": {
+          "type": "submit",
+          "action": {"type": "build_army", "player_id": "general", "country_id": "Warland", "amount": 5}
+        },
+        "expected": {"success": true, "action": {"type": "build_army", "player_id": "general", "country_id": "Warland", "amount": 5}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "merchant_hide", "player_id": "trader", "merchant_id": "trader"}
+        },
+        "expected": {"success": true, "action": {"type": "merchant_hide", "player_id": "trader", "merchant_id": "trader"}}
+      },
+      {
+        "comment": "Advance spending -> war",
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "previous_phase": "spending",
+          "current_phase": "war",
+          "turn": 1,
+          "state": {
+            "turn": 1,
+            "phase": "war",
+            "countries": {
+              "Tyranny": {"country_id": "Tyranny", "hp": 10, "army_strength": 0, "gold": 20, "peasants": 5, "revolt_risk": 3, "is_republic": false, "monarch_id": "tyrant", "died_once": false},
+              "Warland": {"country_id": "Warland", "hp": 10, "army_strength": 5, "gold": 10, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "general", "died_once": false}
+            },
+            "merchants": {
+              "trader": {"player_id": "trader", "country_id": "Tyranny", "stored_gold": 5, "invested_gold": 0}
+            }
+          }
+        }
+      },
+      {
+        "comment": "War: Warland attacks Tyranny",
+        "request": {
+          "type": "submit",
+          "action": {"type": "attack", "player_id": "general", "country_id": "Warland", "target_id": "Tyranny"}
+        },
+        "expected": {"success": true, "action": {"type": "attack", "player_id": "general", "country_id": "Warland", "target_id": "Tyranny"}}
+      },
+      {
+        "comment": "Advance war -> assessment (Warland 5 vs Tyranny 0, damage=5, Tyranny HP 10->5)",
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "previous_phase": "war",
+          "current_phase": "assessment",
+          "turn": 1,
+          "state": {
+            "turn": 1,
+            "phase": "assessment",
+            "countries": {
+              "Tyranny": {"country_id": "Tyranny", "hp": 5, "army_strength": 0, "gold": 20, "peasants": 5, "revolt_risk": 3, "is_republic": false, "monarch_id": "tyrant", "died_once": false},
+              "Warland": {"country_id": "Warland", "hp": 10, "army_strength": 2, "gold": 15, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "general", "died_once": false}
+            },
+            "merchants": {
+              "trader": {"player_id": "trader", "country_id": "Tyranny", "stored_gold": 10, "invested_gold": 0}
+            }
+          }
+        }
+      },
+      {
+        "comment": "Assessment: trader remains",
+        "request": {
+          "type": "submit",
+          "action": {"type": "remain", "player_id": "trader", "merchant_id": "trader"}
+        },
+        "expected": {"success": true, "action": {"type": "remain", "player_id": "trader", "merchant_id": "trader"}}
+      },
+      {
+        "comment": "Advance assessment -> taxation (turn 2)",
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "previous_phase": "assessment",
+          "current_phase": "taxation",
+          "turn": 2,
+          "state": {
+            "turn": 2,
+            "phase": "taxation",
+            "countries": {
+              "Tyranny": {"country_id": "Tyranny", "hp": 5, "army_strength": 0, "gold": 20, "peasants": 5, "revolt_risk": 3, "is_republic": false, "monarch_id": "tyrant", "died_once": false},
+              "Warland": {"country_id": "Warland", "hp": 10, "army_strength": 2, "gold": 15, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "general", "died_once": false}
+            },
+            "merchants": {
+              "trader": {"player_id": "trader", "country_id": "Tyranny", "stored_gold": 10, "invested_gold": 0}
+            }
+          }
+        }
+      },
+
+      {
+        "comment": "=== ROUND 2 === Taxation: tyrant taxes high (roll=6 > risk=3, succeeds), general taxes low",
+        "request": {
+          "type": "submit",
+          "action": {"type": "tax_peasants_high", "player_id": "tyrant", "country_id": "Tyranny"}
+        },
+        "expected": {"success": true, "action": {"type": "tax_peasants_high", "player_id": "tyrant", "country_id": "Tyranny"}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "tax_peasants_low", "player_id": "general", "country_id": "Warland"}
+        },
+        "expected": {"success": true, "action": {"type": "tax_peasants_low", "player_id": "general", "country_id": "Warland"}}
+      },
+      {
+        "comment": "Advance taxation -> negotiation (high tax succeeds again: +10 gold, risk 3->4)",
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "previous_phase": "taxation",
+          "current_phase": "negotiation",
+          "turn": 2,
+          "state": {
+            "turn": 2,
+            "phase": "negotiation",
+            "countries": {
+              "Tyranny": {"country_id": "Tyranny", "hp": 5, "army_strength": 0, "gold": 30, "peasants": 5, "revolt_risk": 4, "is_republic": false, "monarch_id": "tyrant", "died_once": false},
+              "Warland": {"country_id": "Warland", "hp": 10, "army_strength": 2, "gold": 20, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "general", "died_once": false}
+            },
+            "merchants": {
+              "trader": {"player_id": "trader", "country_id": "Tyranny", "stored_gold": 10, "invested_gold": 0}
+            }
+          }
+        }
+      },
+      {
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "previous_phase": "negotiation",
+          "current_phase": "spending",
+          "turn": 2,
+          "state": {
+            "turn": 2,
+            "phase": "spending",
+            "countries": {
+              "Tyranny": {"country_id": "Tyranny", "hp": 5, "army_strength": 0, "gold": 30, "peasants": 5, "revolt_risk": 4, "is_republic": false, "monarch_id": "tyrant", "died_once": false},
+              "Warland": {"country_id": "Warland", "hp": 10, "army_strength": 2, "gold": 20, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "general", "died_once": false}
+            },
+            "merchants": {
+              "trader": {"player_id": "trader", "country_id": "Tyranny", "stored_gold": 10, "invested_gold": 0}
+            }
+          }
+        }
+      },
+      {
+        "comment": "Spending: Warland builds army 5, trader hides",
+        "request": {
+          "type": "submit",
+          "action": {"type": "build_army", "player_id": "general", "country_id": "Warland", "amount": 5}
+        },
+        "expected": {"success": true, "action": {"type": "build_army", "player_id": "general", "country_id": "Warland", "amount": 5}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "merchant_hide", "player_id": "trader", "merchant_id": "trader"}
+        },
+        "expected": {"success": true, "action": {"type": "merchant_hide", "player_id": "trader", "merchant_id": "trader"}}
+      },
+      {
+        "comment": "Advance spending -> war",
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "previous_phase": "spending",
+          "current_phase": "war",
+          "turn": 2,
+          "state": {
+            "turn": 2,
+            "phase": "war",
+            "countries": {
+              "Tyranny": {"country_id": "Tyranny", "hp": 5, "army_strength": 0, "gold": 30, "peasants": 5, "revolt_risk": 4, "is_republic": false, "monarch_id": "tyrant", "died_once": false},
+              "Warland": {"country_id": "Warland", "hp": 10, "army_strength": 7, "gold": 15, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "general", "died_once": false}
+            },
+            "merchants": {
+              "trader": {"player_id": "trader", "country_id": "Tyranny", "stored_gold": 10, "invested_gold": 0}
+            }
+          }
+        }
+      },
+      {
+        "comment": "War: Warland attacks Tyranny",
+        "request": {
+          "type": "submit",
+          "action": {"type": "attack", "player_id": "general", "country_id": "Warland", "target_id": "Tyranny"}
+        },
+        "expected": {"success": true, "action": {"type": "attack", "player_id": "general", "country_id": "Warland", "target_id": "Tyranny"}}
+      },
+      {
+        "comment": "Advance war -> assessment (Warland 7 vs Tyranny 0, damage=7, HP 5->-2, first-death revival HP=1)",
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "previous_phase": "war",
+          "current_phase": "assessment",
+          "turn": 2,
+          "state": {
+            "turn": 2,
+            "phase": "assessment",
+            "countries": {
+              "Tyranny": {"country_id": "Tyranny", "hp": 1, "army_strength": 0, "gold": 30, "peasants": 5, "revolt_risk": 4, "is_republic": false, "monarch_id": "tyrant", "died_once": true},
+              "Warland": {"country_id": "Warland", "hp": 10, "army_strength": 3, "gold": 20, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "general", "died_once": false}
+            },
+            "merchants": {
+              "trader": {"player_id": "trader", "country_id": "Tyranny", "stored_gold": 15, "invested_gold": 0}
+            }
+          }
+        }
+      },
+      {
+        "comment": "Assessment: trader remains",
+        "request": {
+          "type": "submit",
+          "action": {"type": "remain", "player_id": "trader", "merchant_id": "trader"}
+        },
+        "expected": {"success": true, "action": {"type": "remain", "player_id": "trader", "merchant_id": "trader"}}
+      },
+      {
+        "comment": "Advance assessment -> taxation (turn 3)",
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "previous_phase": "assessment",
+          "current_phase": "taxation",
+          "turn": 3,
+          "state": {
+            "turn": 3,
+            "phase": "taxation",
+            "countries": {
+              "Tyranny": {"country_id": "Tyranny", "hp": 1, "army_strength": 0, "gold": 30, "peasants": 5, "revolt_risk": 4, "is_republic": false, "monarch_id": "tyrant", "died_once": true},
+              "Warland": {"country_id": "Warland", "hp": 10, "army_strength": 3, "gold": 20, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "general", "died_once": false}
+            },
+            "merchants": {
+              "trader": {"player_id": "trader", "country_id": "Tyranny", "stored_gold": 15, "invested_gold": 0}
+            }
+          }
+        }
+      },
+
+      {
+        "comment": "=== ROUND 3 === Taxation: tyrant taxes high (roll=3 <= risk=4, REVOLT! -2 HP, kills permanently)",
+        "request": {
+          "type": "submit",
+          "action": {"type": "tax_peasants_high", "player_id": "tyrant", "country_id": "Tyranny"}
+        },
+        "expected": {"success": true, "action": {"type": "tax_peasants_high", "player_id": "tyrant", "country_id": "Tyranny"}}
+      },
+      {
+        "request": {
+          "type": "submit",
+          "action": {"type": "tax_peasants_low", "player_id": "general", "country_id": "Warland"}
+        },
+        "expected": {"success": true, "action": {"type": "tax_peasants_low", "player_id": "general", "country_id": "Warland"}}
+      },
+      {
+        "comment": "Advance taxation -> negotiation (roll=3 <= risk=4: REVOLT! -2 HP, Tyranny HP 1->-1, permanent death)",
+        "request": {"type": "advance"},
+        "expected": {
+          "success": true,
+          "previous_phase": "taxation",
+          "current_phase": "negotiation",
+          "turn": 3,
+          "state": {
+            "turn": 3,
+            "phase": "negotiation",
+            "countries": {
+              "Tyranny": {"country_id": "Tyranny", "hp": -1, "army_strength": 0, "gold": 30, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "tyrant", "died_once": true},
+              "Warland": {"country_id": "Warland", "hp": 10, "army_strength": 3, "gold": 25, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "general", "died_once": false}
+            },
+            "merchants": {
+              "trader": {"player_id": "trader", "country_id": "Tyranny", "stored_gold": 15, "invested_gold": 0}
+            }
+          }
+        }
+      },
+      {
+        "comment": "Final state: Tyranny dead from revolt, merchant still in Tyranny (no annexation from revolt death)",
+        "request": {"type": "get_state"},
+        "expected": {
+          "success": true,
+          "state": {
+            "turn": 3,
+            "phase": "negotiation",
+            "countries": {
+              "Tyranny": {"country_id": "Tyranny", "hp": -1, "army_strength": 0, "gold": 30, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "tyrant", "died_once": true},
+              "Warland": {"country_id": "Warland", "hp": 10, "army_strength": 3, "gold": 25, "peasants": 5, "revolt_risk": 2, "is_republic": false, "monarch_id": "general", "died_once": false}
+            },
+            "merchants": {
+              "trader": {"player_id": "trader", "country_id": "Tyranny", "stored_gold": 15, "invested_gold": 0}
+            }
+          }
+        }
+      }
+    ]
   }
 ]
