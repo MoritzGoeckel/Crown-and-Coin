@@ -94,13 +94,6 @@ document.getElementById('add-merchant-btn').addEventListener('click', () => {
     }
 });
 
-document.getElementById('remove-player-btn').addEventListener('click', () => {
-    const playerId = document.getElementById('remove-player-select').value;
-    if (playerId) {
-        send({ type: 'remove_merchant', player_id: playerId });
-    }
-});
-
 async function signup() {
     const name = signupUsernameInput.value.trim();
     const secret = signupSecretInput.value.trim();
@@ -445,35 +438,6 @@ function updateAdminSelects() {
         countrySelect.appendChild(option);
     }
     if (prevCountry) countrySelect.value = prevCountry;
-
-    const playerSelect = document.getElementById('remove-player-select');
-    const prevPlayer = playerSelect.value;
-    playerSelect.innerHTML = '';
-
-    // Add all active players (merchants and monarchs)
-    const activePlayers = new Set();
-
-    // Add merchants
-    for (const merchantId of Object.keys(gameState.merchants || {})) {
-        activePlayers.add(merchantId);
-    }
-
-    // Add monarchs
-    for (const country of Object.values(gameState.countries || {})) {
-        if (country.monarch_id && !country.is_republic) {
-            activePlayers.add(country.monarch_id);
-        }
-    }
-
-    // Populate dropdown with all active players
-    Array.from(activePlayers).sort().forEach(playerId => {
-        const option = document.createElement('option');
-        option.value = playerId;
-        option.textContent = playerId;
-        playerSelect.appendChild(option);
-    });
-
-    if (prevPlayer) playerSelect.value = prevPlayer;
 
     updateMerchantSelect();
 }

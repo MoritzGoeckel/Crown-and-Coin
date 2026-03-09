@@ -9,7 +9,6 @@ const (
 	RequestGetPlayers       RequestType = "get_players"
 	RequestAddMerchant      RequestType = "add_merchant"
 	RequestAddCountry       RequestType = "add_country"
-	RequestRemoveMerchant   RequestType = "remove_merchant"
 	RequestGetState         RequestType = "get_state"
 	RequestGetActions       RequestType = "get_actions"
 	RequestSubmit           RequestType = "submit"
@@ -36,12 +35,6 @@ type AddCountryRequest struct {
 	Type      RequestType `json:"type"`
 	CountryID string      `json:"country_id"`
 	MonarchID string      `json:"monarch_id"`
-}
-
-// RemoveMerchantRequest removes a merchant from the game
-type RemoveMerchantRequest struct {
-	Type     RequestType `json:"type"`
-	PlayerID string      `json:"player_id"`
 }
 
 // GetActionsRequest requests valid actions for a player
@@ -119,12 +112,6 @@ type AddMerchantResponse struct {
 
 // AddCountryResponse confirms country addition
 type AddCountryResponse struct {
-	Success bool   `json:"success"`
-	Error   string `json:"error,omitempty"`
-}
-
-// RemoveMerchantResponse confirms merchant removal
-type RemoveMerchantResponse struct {
 	Success bool   `json:"success"`
 	Error   string `json:"error,omitempty"`
 }
@@ -230,13 +217,6 @@ func ParseRequest(data []byte) (RequestType, interface{}, error) {
 
 	case RequestAddCountry:
 		var req AddCountryRequest
-		if err := json.Unmarshal(data, &req); err != nil {
-			return base.Type, nil, err
-		}
-		return base.Type, &req, nil
-
-	case RequestRemoveMerchant:
-		var req RemoveMerchantRequest
 		if err := json.Unmarshal(data, &req); err != nil {
 			return base.Type, nil, err
 		}

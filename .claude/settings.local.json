@@ -9,7 +9,8 @@
       "Bash(go mod tidy:*)",
       "Bash(dir:*)",
       "Bash(timeout:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(xargs grep:*)"
     ]
   }
 }

@@ -55,8 +55,6 @@ func (api *GameAPI) ProcessMessage(data []byte) ([]byte, error) {
 		response = api.handleAddMerchant(req.(*AddMerchantRequest))
 	case RequestAddCountry:
 		response = api.handleAddCountry(req.(*AddCountryRequest))
-	case RequestRemoveMerchant:
-		response = api.handleRemoveMerchant(req.(*RemoveMerchantRequest))
 	case RequestGetState:
 		response = api.handleGetState()
 	case RequestGetActions:
@@ -170,19 +168,6 @@ func (api *GameAPI) handleAddCountry(req *AddCountryRequest) *AddCountryResponse
 	state.AddCountry(country)
 
 	return &AddCountryResponse{Success: true}
-}
-
-func (api *GameAPI) handleRemoveMerchant(req *RemoveMerchantRequest) *RemoveMerchantResponse {
-	state := api.engine.GetState()
-
-	if !state.RemoveMerchant(req.PlayerID) {
-		return &RemoveMerchantResponse{
-			Success: false,
-			Error:   fmt.Sprintf("player_id '%s' not found", req.PlayerID),
-		}
-	}
-
-	return &RemoveMerchantResponse{Success: true}
 }
 
 func (api *GameAPI) handleGetState() *StateResponse {

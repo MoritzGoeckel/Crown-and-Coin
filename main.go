@@ -166,7 +166,7 @@ func (s *Server) canSendMessage(user string, payload json.RawMessage) bool {
 			return false
 		}
 		return submitMsg.Action.PlayerID == user
-	case "add_country", "add_merchant", "remove_merchant", "advance":
+	case "add_country", "add_merchant", "advance":
 		return false // admin only
 	default:
 		return false
