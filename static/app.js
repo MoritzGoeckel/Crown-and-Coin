@@ -69,7 +69,10 @@ signupSecretInput.addEventListener('keypress', (e) => {
 });
 
 document.getElementById('advance-btn').addEventListener('click', () => {
+    const btn = document.getElementById('advance-btn');
+    btn.disabled = true;
     send({ type: 'advance' });
+    setTimeout(() => { btn.disabled = false; }, 5000);
 });
 
 document.getElementById('add-country-btn').addEventListener('click', () => {
