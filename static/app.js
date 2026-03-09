@@ -245,6 +245,12 @@ function connectToServer(name, secret) {
             }
         }
 
+        // Handle cancel actions response
+        if (data.removed !== undefined) {
+            refreshQueuedActions();
+            refreshActions();
+        }
+
         // Handle submit response (new format with single action)
         if (data.action !== undefined) {
             if (data.success === false && data.rejection_reason) {
@@ -691,6 +697,25 @@ function renderQueuedActions(actions) {
         item.appendChild(actionText);
         queuedActionsList.appendChild(item);
     });
+
+    // Show "Cancel All" button if the current user has queued actions
+    const hasOwnActions = actions.some(a => a.player_id === currentUser);
+    if (hasOwnActions && currentUser !== 'admin') {
+        const cancelBtn = document.createElement('button');
+        cancelBtn.textContent = 'Cancel All';
+        cancelBtn.style.marginTop = '8px';
+        cancelBtn.style.backgroundColor = '#cc3333';
+        cancelBtn.style.color = '#fff';
+        cancelBtn.style.border = 'none';
+        cancelBtn.style.padding = '8px 16px';
+        cancelBtn.style.borderRadius = '4px';
+        cancelBtn.style.cursor = 'pointer';
+        cancelBtn.style.width = '100%';
+        cancelBtn.addEventListener('click', () => {
+            send({ type: 'cancel_actions', player_id: currentUser });
+        });
+        queuedActionsList.appendChild(cancelBtn);
+    }
 }
 
 function renderRejectedActions(rejectedActions) {

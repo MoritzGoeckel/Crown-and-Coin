@@ -67,6 +67,8 @@ func (api *GameAPI) ProcessMessage(data []byte) ([]byte, error) {
 		response = api.handleGetQueued(req.(*GetQueuedRequest))
 	case RequestPendingActions:
 		response = api.handleGetPendingActions(req.(*GetPendingActionsRequest))
+	case RequestCancelActions:
+		response = api.handleCancelActions(req.(*CancelActionsRequest))
 	case RequestAdvance:
 		response = api.handleAdvance()
 	default:
@@ -504,6 +506,21 @@ func (api *GameAPI) handleGetPendingActions(req *GetPendingActionsRequest) *Pend
 		Success: true,
 		Phase:   state.Phase.String(),
 		Actions: filteredActions,
+	}
+}
+
+func (api *GameAPI) handleCancelActions(req *CancelActionsRequest) *CancelActionsResponse {
+	if req.PlayerID == "" {
+		return &CancelActionsResponse{
+			Success: false,
+			Error:   "player_id is required",
+		}
+	}
+
+	removed := api.engine.ClearPendingActionsByPlayer(req.PlayerID)
+	return &CancelActionsResponse{
+		Success: true,
+		Removed: removed,
 	}
 }
 

@@ -15,6 +15,7 @@ const (
 	RequestSubmit           RequestType = "submit"
 	RequestGetQueued        RequestType = "get_queued"
 	RequestPendingActions   RequestType = "pending_actions"
+	RequestCancelActions    RequestType = "cancel_actions"
 	RequestAdvance          RequestType = "advance"
 )
 
@@ -65,6 +66,19 @@ type GetPendingActionsRequest struct {
 type SubmitRequest struct {
 	Type   RequestType `json:"type"`
 	Action ActionJSON  `json:"action"`
+}
+
+// CancelActionsRequest cancels all pending actions for a player
+type CancelActionsRequest struct {
+	Type     RequestType `json:"type"`
+	PlayerID string      `json:"player_id"`
+}
+
+// CancelActionsResponse confirms cancellation
+type CancelActionsResponse struct {
+	Success bool   `json:"success"`
+	Removed int    `json:"removed"`
+	Error   string `json:"error,omitempty"`
 }
 
 // ActionJSON is a generic JSON representation of any action
@@ -254,6 +268,13 @@ func ParseRequest(data []byte) (RequestType, interface{}, error) {
 
 	case RequestPendingActions:
 		var req GetPendingActionsRequest
+		if err := json.Unmarshal(data, &req); err != nil {
+			return base.Type, nil, err
+		}
+		return base.Type, &req, nil
+
+	case RequestCancelActions:
+		var req CancelActionsRequest
 		if err := json.Unmarshal(data, &req); err != nil {
 			return base.Type, nil, err
 		}
