@@ -43,7 +43,7 @@ The websocket messages follow that patter:
 
 - [x] The drop down for merchant name should be populated by players in admin menu
 
-- [ ] There needs to be feedback in the interface which action the player logged in. Maybe we need to change engine to ask for chosen action, have that in the game state
+- [?] There needs to be feedback in the interface which action the player logged in. Maybe we need to change engine to ask for chosen action, have that in the game state
 
 - [x] Separate registration and login
 
@@ -99,6 +99,9 @@ The websocket messages follow that patter:
 
 - [ ] change peasants to 5
 - [ ] taxation should be 2 gold or 1 gold per peasant
+- [ ] No tax on revolt
+- [ ] low tax reduces risk to 2/6
+- [ ] Increase chance of revolt if none happend
 
 - [ ] Republic: Vote on hi/lo taxation and war. Most votes option wins.
     - [ ] Money goes from peasants directly to merchants
@@ -108,15 +111,18 @@ The websocket messages follow that patter:
 
 - [ ] Remove this 'end of turn 1 - taxation' thing from history in frontend
 
+
 - [ ] Not everybody should have the same peasant revolt
+
 
 - [ ] Disable advance phase button for 5 seconds after clicking
 
-- [ ] Monarch should only be able to attack one country
 
-- [ ] A country should not die in a attack in one round when multiple countries attack it
+- [/] Monarch should only be able to attack one country
 
-- [ ] When killing a country all participants share the peasants and merchants
+- [/] A country should not die in a attack in one round when multiple countries attack it
+
+- [/] When killing a country all participants share the peasants and merchants
 
 # Misc
 

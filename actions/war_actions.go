@@ -87,30 +87,6 @@ func (a *AttackAction) Apply(state *engine.GameState, roller engine.DiceRoller) 
 		winnerID, damage,
 	))
 
-	// Check for annexation (if defender is defeated)
-	if !defender.IsAlive() {
-		merchantIDs := []string{}
-		for _, m := range newState.GetMerchantsByCountry(a.DefenderID) {
-			m.CountryID = a.AttackerID
-			merchantIDs = append(merchantIDs, m.ID)
-		}
-		attacker.AddPeasant() // Winner gets one peasant
-
-		evts = append(evts, events.NewAnnexationEvent(a.AttackerID, a.DefenderID, merchantIDs))
-	}
-
-	// Check if attacker was defeated
-	if !attacker.IsAlive() {
-		merchantIDs := []string{}
-		for _, m := range newState.GetMerchantsByCountry(a.AttackerID) {
-			m.CountryID = a.DefenderID
-			merchantIDs = append(merchantIDs, m.ID)
-		}
-		defender.AddPeasant()
-
-		evts = append(evts, events.NewAnnexationEvent(a.DefenderID, a.AttackerID, merchantIDs))
-	}
-
 	return newState, evts
 }
 

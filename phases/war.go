@@ -47,19 +47,111 @@ func (p *WarPhase) ValidActions(state *engine.GameState, playerID string) []acti
 	return validActions
 }
 
+type battleResult struct {
+	attackerID string
+	defenderID string
+	winnerID   string
+	damage     int
+	goldBonus  int
+}
+
 func (p *WarPhase) Execute(state *engine.GameState, playerActions []actions.Action) (*engine.GameState, []events.Event) {
+	snapshot := state.Clone()
 	newState := state.Clone()
 	var allEvents []events.Event
 
-	// Process all attack actions
+	// Pass 1: compute all battles against the snapshot state
+	var results []battleResult
 	for _, action := range playerActions {
-		if err := action.Validate(newState); err != nil {
-			continue // Skip invalid actions
+		attackAction, ok := action.(*actions.AttackAction)
+		if !ok {
+			continue
+		}
+		if err := attackAction.Validate(snapshot); err != nil {
+			continue
 		}
 
-		var actionEvents []events.Event
-		newState, actionEvents = action.Apply(newState, p.dice)
-		allEvents = append(allEvents, actionEvents...)
+		attacker := snapshot.GetCountry(attackAction.AttackerID)
+		defender := snapshot.GetCountry(attackAction.DefenderID)
+
+		attackerStr := attacker.ArmyStrength
+		defenderStr := defender.ArmyStrength
+
+		var winnerID string
+		var damage, goldBonus int
+
+		if attackerStr > defenderStr {
+			winnerID = attackAction.AttackerID
+			damage = attackerStr - defenderStr
+			goldBonus = 5
+		} else if defenderStr > attackerStr {
+			winnerID = attackAction.DefenderID
+			damage = defenderStr - attackerStr
+			goldBonus = 5
+		}
+
+		results = append(results, battleResult{
+			attackerID: attackAction.AttackerID,
+			defenderID: attackAction.DefenderID,
+			winnerID:   winnerID,
+			damage:     damage,
+			goldBonus:  goldBonus,
+		})
+
+		allEvents = append(allEvents, events.NewBattleResolvedEvent(
+			attackAction.AttackerID, attackAction.DefenderID,
+			attackerStr, defenderStr,
+			winnerID, damage,
+		))
+	}
+
+	// Pass 2: apply outcomes
+	// Track accumulated damage per defender and which attackers targeted them
+	defenderDamage := make(map[string]int)
+	defenderAttackers := make(map[string][]string)
+
+	for _, r := range results {
+		// Apply gold bonus to winner
+		if r.winnerID != "" {
+			winner := newState.GetCountry(r.winnerID)
+			if winner != nil {
+				winner.AddGold(r.goldBonus)
+			}
+		}
+		// Accumulate damage on defender (only when attacker won)
+		if r.winnerID == r.attackerID {
+			defenderDamage[r.defenderID] += r.damage
+			defenderAttackers[r.defenderID] = append(defenderAttackers[r.defenderID], r.attackerID)
+		}
+		// Accumulate damage on attacker (only when defender won)
+		if r.winnerID == r.defenderID {
+			defenderDamage[r.attackerID] += r.damage
+			defenderAttackers[r.attackerID] = append(defenderAttackers[r.attackerID], r.defenderID)
+		}
+	}
+
+	// Apply accumulated damage and handle annexation
+	for defID, totalDamage := range defenderDamage {
+		def := newState.GetCountry(defID)
+		if def == nil {
+			continue
+		}
+		def.TakeDamage(totalDamage)
+		if !def.IsAlive() {
+			attackerIDs := defenderAttackers[defID]
+			allEvents = append(allEvents, p.annex(newState, defID, attackerIDs)...)
+		}
+	}
+
+	// Handle NoAttack actions (pass-through for non-attack actions)
+	for _, action := range playerActions {
+		if _, ok := action.(*actions.AttackAction); ok {
+			continue
+		}
+		if err := action.Validate(newState); err != nil {
+			continue
+		}
+		newState, _ = action.Apply(newState, p.dice)
 	}
 
 	// After all battles, halve all armies (maintenance cost)
@@ -86,4 +178,43 @@ func (p *WarPhase) Execute(state *engine.GameState, playerActions []actions.Acti
 	}
 
 	return newState, allEvents
+}
+
+// annex distributes the spoils of a defeated country among its attackers.
+func (p *WarPhase) annex(state *engine.GameState, defeatedID string, attackerIDs []string) []events.Event {
+	if len(attackerIDs) == 0 {
+		return nil
+	}
+
+	// Assign merchants round-robin
+	merchants := state.GetMerchantsByCountry(defeatedID)
+	merchantIDs := make([]string, 0, len(merchants))
+	for i, m := range merchants {
+		m.CountryID = attackerIDs[i%len(attackerIDs)]
+		merchantIDs = append(merchantIDs, m.ID)
+	}
+
+	// Split peasants evenly
+	defeated := state.GetCountry(defeatedID)
+	if defeated == nil {
+		return nil
+	}
+	peasants := defeated.Peasants
+	share := peasants / len(attackerIDs)
+	remainder := peasants % len(attackerIDs)
+	for i, id := range attackerIDs {
+		attacker := state.GetCountry(id)
+		if attacker == nil {
+			continue
+		}
+		extra := 0
+		if i < remainder {
+			extra = 1
+		}
+		for j := 0; j < share+extra; j++ {
+			attacker.AddPeasant()
+		}
+	}
+
+	return []events.Event{events.NewAnnexationEvent(attackerIDs, defeatedID, merchantIDs)}
 }

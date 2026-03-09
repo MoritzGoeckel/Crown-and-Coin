@@ -185,26 +185,26 @@ func (e *BattleResolvedEvent) String() string {
 // AnnexationEvent - country annexed after defeat
 type AnnexationEvent struct {
 	*BaseEvent
-	WinnerID     string
-	DefeatedID   string
+	WinnerIDs      []string
+	DefeatedID     string
 	MerchantsTaken []string
 }
 
-func NewAnnexationEvent(winnerID, defeatedID string, merchants []string) *AnnexationEvent {
+func NewAnnexationEvent(winnerIDs []string, defeatedID string, merchants []string) *AnnexationEvent {
 	e := &AnnexationEvent{
 		BaseEvent:      NewBaseEvent(EventAnnexation),
-		WinnerID:       winnerID,
+		WinnerIDs:      winnerIDs,
 		DefeatedID:     defeatedID,
 		MerchantsTaken: merchants,
 	}
-	e.Set("winner_id", winnerID)
+	e.Set("winner_ids", winnerIDs)
 	e.Set("defeated_id", defeatedID)
 	e.Set("merchants", merchants)
 	return e
 }
 
 func (e *AnnexationEvent) String() string {
-	return fmt.Sprintf("Country %s annexed %s, taking %d merchants", e.WinnerID, e.DefeatedID, len(e.MerchantsTaken))
+	return fmt.Sprintf("Countries %v annexed %s, taking %d merchants", e.WinnerIDs, e.DefeatedID, len(e.MerchantsTaken))
 }
 
 // MerchantFledEvent - merchant fled to another country
