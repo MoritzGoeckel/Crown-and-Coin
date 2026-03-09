@@ -89,13 +89,13 @@ The websocket messages follow that patter:
 - [ ] New game
 - [ ] Save game, so can continue after program restart (game state, history)
 
-- [ ] Remove players does not work
+- [x] Remove players does not work
     - Only monarchs and merchants
     - Does not do anything
 
 - [/] Cancel pending actions as player
 
-- [/] change peasants to 5
+- [x] change peasants to 5
 - [/] taxation should be 2 gold or 1 gold per peasant
 - [/] No tax on revolt
 - [/] low tax reduces risk to 2/6
@@ -114,7 +114,8 @@ The websocket messages follow that patter:
 - [/] Not everybody should have the same peasant revolt
 
 
-- [/] Disable advance phase button for 5 seconds after clicking
+- [x] Disable advance phase button for 5 seconds after clicking
+    - [ ] make it visible
 
 
 - [/] Monarch should only be able to attack one country

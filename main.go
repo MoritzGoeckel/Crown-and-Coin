@@ -153,7 +153,7 @@ func (s *Server) canSendMessage(user string, payload json.RawMessage) bool {
 	switch msg.Type {
 	case "get_state", "get_players", "get_connected_players", "get_history":
 		return true
-	case "get_actions", "get_queued":
+	case "get_actions", "get_queued", "cancel_actions":
 		return msg.PlayerID == user
 	case "submit":
 		// Check if action belongs to this user
