@@ -4,6 +4,7 @@ import (
 	"crown_and_coin/actions"
 	"crown_and_coin/engine"
 	"crown_and_coin/events"
+	"sort"
 )
 
 // WarPhase handles Phase 4: War
@@ -185,6 +186,9 @@ func (p *WarPhase) annex(state *engine.GameState, defeatedID string, attackerIDs
 	if len(attackerIDs) == 0 {
 		return nil
 	}
+
+	// Sort attackerIDs for deterministic distribution
+	sort.Strings(attackerIDs)
 
 	// Assign merchants round-robin
 	merchants := state.GetMerchantsByCountry(defeatedID)

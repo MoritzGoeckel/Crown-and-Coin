@@ -10,7 +10,9 @@
       "Bash(dir:*)",
       "Bash(timeout:*)",
       "Bash(git stash:*)",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Bash(do echo:*)",
+      "Bash(do go:*)"
     ]
   }
 }

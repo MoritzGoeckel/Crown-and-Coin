@@ -3,6 +3,7 @@ package engine
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 )
 
 // GameState represents the complete state of the game at any point
@@ -100,7 +101,7 @@ func (gs *GameState) GetMerchant(id string) *Merchant {
 	return gs.Merchants[id]
 }
 
-// GetMerchantsByCountry returns all merchants belonging to a country
+// GetMerchantsByCountry returns all merchants belonging to a country, sorted by ID
 func (gs *GameState) GetMerchantsByCountry(countryID string) []*Merchant {
 	var merchants []*Merchant
 	for _, m := range gs.Merchants {
@@ -108,6 +109,9 @@ func (gs *GameState) GetMerchantsByCountry(countryID string) []*Merchant {
 			merchants = append(merchants, m)
 		}
 	}
+	sort.Slice(merchants, func(i, j int) bool {
+		return merchants[i].ID < merchants[j].ID
+	})
 	return merchants
 }
 
