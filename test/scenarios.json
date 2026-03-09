@@ -922,5 +922,106 @@
         }
       }
     ]
+  },
+  {
+    "name": "Cancel pending actions",
+    "seed": 12345,
+    "steps": [
+      {
+        "request": {"type": "add_country", "country_id": "Avalon", "monarch_id": "alice"},
+        "expected": {"success": true}
+      },
+      {
+        "request": {"type": "add_country", "country_id": "Britannia", "monarch_id": "bob"},
+        "expected": {"success": true}
+      },
+      {
+        "request": {"type": "add_merchant", "player_id": "charlie", "country_id": "Avalon"},
+        "expected": {"success": true}
+      },
+      {
+        "comment": "Submit actions for alice",
+        "request": {
+          "type": "submit",
+          "action": {"type": "tax_peasants_high", "player_id": "alice", "country_id": "Avalon"}
+        },
+        "expected": {"success": true, "action": {"type": "tax_peasants_high", "player_id": "alice", "country_id": "Avalon"}}
+      },
+      {
+        "comment": "Submit tax_merchants for alice",
+        "request": {
+          "type": "submit",
+          "action": {"type": "tax_merchants", "player_id": "alice", "country_id": "Avalon", "merchant_id": "charlie", "amount": 2}
+        },
+        "expected": {"success": true, "action": {"type": "tax_merchants", "player_id": "alice", "country_id": "Avalon", "merchant_id": "charlie", "amount": 2}}
+      },
+      {
+        "comment": "Submit action for bob",
+        "request": {
+          "type": "submit",
+          "action": {"type": "tax_peasants_low", "player_id": "bob", "country_id": "Britannia"}
+        },
+        "expected": {"success": true, "action": {"type": "tax_peasants_low", "player_id": "bob", "country_id": "Britannia"}}
+      },
+      {
+        "comment": "Verify all 3 actions are pending",
+        "request": {"type": "pending_actions"},
+        "expected": {
+          "success": true,
+          "phase": "taxation",
+          "actions": [
+            {"type": "tax_peasants_high", "player_id": "alice", "country_id": "Avalon"},
+            {"type": "tax_merchants", "player_id": "alice", "country_id": "Avalon", "merchant_id": "charlie", "amount": 2},
+            {"type": "tax_peasants_low", "player_id": "bob", "country_id": "Britannia"}
+          ]
+        }
+      },
+      {
+        "comment": "Cancel alice's actions - should remove 2",
+        "request": {"type": "cancel_actions", "player_id": "alice"},
+        "expected": {"success": true, "removed": 2}
+      },
+      {
+        "comment": "Verify only bob's action remains",
+        "request": {"type": "pending_actions"},
+        "expected": {
+          "success": true,
+          "phase": "taxation",
+          "actions": [
+            {"type": "tax_peasants_low", "player_id": "bob", "country_id": "Britannia"}
+          ]
+        }
+      },
+      {
+        "comment": "Cancel alice again - should remove 0",
+        "request": {"type": "cancel_actions", "player_id": "alice"},
+        "expected": {"success": true, "removed": 0}
+      },
+      {
+        "comment": "Alice can now resubmit actions",
+        "request": {
+          "type": "submit",
+          "action": {"type": "tax_peasants_low", "player_id": "alice", "country_id": "Avalon"}
+        },
+        "expected": {"success": true, "action": {"type": "tax_peasants_low", "player_id": "alice", "country_id": "Avalon"}}
+      },
+      {
+        "comment": "Verify both actions now pending",
+        "request": {"type": "pending_actions"},
+        "expected": {
+          "success": true,
+          "phase": "taxation",
+          "actions": [
+            {"type": "tax_peasants_low", "player_id": "bob", "country_id": "Britannia"},
+            {"type": "tax_peasants_low", "player_id": "alice", "country_id": "Avalon"}
+          ]
+        }
+      },
+      {
+        "comment": "Cancel with empty player_id should fail",
+        "request": {"type": "cancel_actions", "player_id": ""},
+        "expected": {"success": false, "error": "player_id is required", "removed": 0}
+      }
+    ]
   }
 ]

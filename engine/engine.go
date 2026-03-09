@@ -176,13 +176,18 @@ func (e *Engine) ClearPendingActions() {
 	e.pendingActions = make([]interface{}, 0)
 }
 
+// playerIdentifier is a minimal interface for actions that have a player ID
+type playerIdentifier interface {
+	PlayerID() string
+}
+
 // ClearPendingActionsByPlayer removes all pending actions for a specific player
 // Returns the number of removed actions
 func (e *Engine) ClearPendingActionsByPlayer(playerID string) int {
 	kept := make([]interface{}, 0, len(e.pendingActions))
 	removed := 0
 	for _, act := range e.pendingActions {
-		if a, ok := act.(Action); ok && a.PlayerID() == playerID {
+		if a, ok := act.(playerIdentifier); ok && a.PlayerID() == playerID {
 			removed++
 		} else {
 			kept = append(kept, act)
