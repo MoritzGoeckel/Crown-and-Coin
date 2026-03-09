@@ -83,23 +83,34 @@ The websocket messages follow that patter:
 
 - [x] Try out fleeing
 - [x] Merchant revolt works
+- [x] No tax on revolt
+
+# Done
+
+- [?] Remove this 'end of turn 1 - taxation' thing from history in frontend
+
+- [x] Remove players does not work
+    - Only monarchs and merchants
+    - Does not do anything
+
+- [x] change peasants to 5
+
+- [x] Monarch should only be able to attack one country
+- [x] Not everybody should have the same peasant revolt
+- [x] Increase chance of revolt if none happend
+
+- [x] A country should not die in a attack in one round when multiple countries attack it
+
+- [x] low tax reduces risk to 2/6
+
+- [x] taxation should be 2 gold or 1 gold per peasant
 
 ## new features
 
 - [ ] New game
 - [ ] Save game, so can continue after program restart (game state, history)
 
-- [x] Remove players does not work
-    - Only monarchs and merchants
-    - Does not do anything
-
 - [/] Cancel pending actions as player
-
-- [x] change peasants to 5
-- [/] taxation should be 2 gold or 1 gold per peasant
-- [/] No tax on revolt
-- [/] low tax reduces risk to 2/6
-- [/] Increase chance of revolt if none happend
 
 - [ ] Add republic voting - Extend actions for merchant republics
 - [ ] Republic: Vote on hi/lo taxation and war. Most votes option wins.
@@ -108,19 +119,8 @@ The websocket messages follow that patter:
 
 ## bugs
 
-- [ ] Remove this 'end of turn 1 - taxation' thing from history in frontend
-
-
-- [/] Not everybody should have the same peasant revolt
-
-
 - [x] Disable advance phase button for 5 seconds after clicking
-    - [ ] make it visible
-
-
-- [/] Monarch should only be able to attack one country
-
-- [/] A country should not die in a attack in one round when multiple countries attack it
+    - [/] make it visible
 
 - [/] When killing a country all participants share the peasants and merchants
 

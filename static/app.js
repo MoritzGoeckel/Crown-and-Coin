@@ -827,32 +827,8 @@ function renderHistory(history) {
         historyDisplay.appendChild(group);
     });
 
-    // Render state snapshots
-    const snapshots = history.state_snapshots || [];
-    snapshots.forEach(snapshot => {
-        const snapshotDiv = document.createElement('div');
-        snapshotDiv.className = 'history-snapshot';
-
-        const title = document.createElement('div');
-        title.className = 'history-snapshot-title';
-        title.textContent = `End of Turn ${snapshot.turn} - ${snapshot.phase}`;
-        snapshotDiv.appendChild(title);
-
-        const data = document.createElement('div');
-        data.className = 'history-snapshot-data';
-
-        if (snapshot.state) {
-            const countriesCount = Object.keys(snapshot.state.countries || {}).length;
-            const merchantsCount = Object.keys(snapshot.state.merchants || {}).length;
-            data.textContent = `${countriesCount} countries, ${merchantsCount} merchants`;
-        }
-
-        snapshotDiv.appendChild(data);
-        historyDisplay.appendChild(snapshotDiv);
-    });
-
     // Show message if no history
-    if (actions.length === 0 && snapshots.length === 0) {
+    if (actions.length === 0) {
         const empty = document.createElement('div');
         empty.textContent = 'No history yet';
         empty.style.color = '#666';

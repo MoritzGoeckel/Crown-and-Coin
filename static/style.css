@@ -359,8 +359,14 @@ header h1 {
     font-weight: bold;
 }
 
-.admin-btn.primary:hover {
+.admin-btn.primary:hover:not(:disabled) {
     background: #ffed4a;
+}
+
+.admin-btn.primary:disabled {
+    background: #666;
+    color: #999;
+    cursor: not-allowed;
 }
 
 .admin-btn.danger {
