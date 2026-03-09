@@ -112,10 +112,10 @@ The websocket messages follow that patter:
 - [ ] Remove this 'end of turn 1 - taxation' thing from history in frontend
 
 
-- [ ] Not everybody should have the same peasant revolt
+- [/] Not everybody should have the same peasant revolt
 
 
-- [ ] Disable advance phase button for 5 seconds after clicking
+- [/] Disable advance phase button for 5 seconds after clicking
 
 
 - [/] Monarch should only be able to attack one country

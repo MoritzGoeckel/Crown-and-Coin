@@ -89,7 +89,7 @@ func NewServer() *Server {
 	return &Server{
 		users:   make(map[string]*User),
 		clients: make(map[*ClientConn]string),
-		api:     jsonapi.NewGameAPIWithDice(engine.NewSeededDice(42)),
+		api:     jsonapi.NewGameAPIWithDice(engine.NewRandomDice()),
 		upgrader: websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
 				return true
