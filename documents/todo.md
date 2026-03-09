@@ -95,14 +95,13 @@ The websocket messages follow that patter:
 
 - [ ] Cancel pending actions as player
 
-- [ ] Add republic voting - Extend actions for merchant republics
-
 - [ ] change peasants to 5
 - [ ] taxation should be 2 gold or 1 gold per peasant
 - [ ] No tax on revolt
 - [ ] low tax reduces risk to 2/6
 - [ ] Increase chance of revolt if none happend
 
+- [ ] Add republic voting - Extend actions for merchant republics
 - [ ] Republic: Vote on hi/lo taxation and war. Most votes option wins.
     - [ ] Money goes from peasants directly to merchants
     - [ ] Merchants invest into army themselve

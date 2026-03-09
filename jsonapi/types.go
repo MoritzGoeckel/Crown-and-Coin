@@ -136,6 +136,7 @@ type CountryJSON struct {
 	ArmyStrength int    `json:"army_strength"`
 	Gold         int    `json:"gold"`
 	Peasants     int    `json:"peasants"`
+	RevoltRisk   int    `json:"revolt_risk"`
 	IsRepublic   bool   `json:"is_republic"`
 	MonarchID    string `json:"monarch_id"`
 	DiedOnce     bool   `json:"died_once"`

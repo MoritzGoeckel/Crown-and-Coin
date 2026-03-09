@@ -392,6 +392,10 @@ function renderState(state) {
                     <span class="stat-label">Peasants</span>
                     <span class="stat-value">${country.peasants}</span>
                 </div>
+                <div class="stat">
+                    <span class="stat-label">Revolt</span>
+                    <span class="stat-value">${country.revolt_risk}/6</span>
+                </div>
             </div>
         `;
         countriesDisplay.appendChild(card);

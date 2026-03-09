@@ -6,7 +6,8 @@ type Country struct {
 	HP           int    `json:"hp"`             // Health points, starts at 10
 	ArmyStrength int    `json:"army_strength"`  // Military power, starts at 0
 	Gold         int    `json:"gold"`           // Treasury
-	Peasants     int    `json:"peasants"`       // Tax base, starts at 1
+	Peasants     int    `json:"peasants"`       // Tax base, starts at 5
+	RevoltRisk   int    `json:"revolt_risk"`    // N in N/6 chance of revolt on high tax (2-5)
 	IsRepublic   bool   `json:"is_republic"`    // false = monarchy, true = merchant republic
 	MonarchID    string `json:"monarch_id"`     // Player controlling the country (if monarchy)
 	DiedOnce     bool   `json:"died_once"`      // Tracks if country already used its "revival"
@@ -19,7 +20,8 @@ func NewCountry(id string, monarchID string) *Country {
 		HP:           10,
 		ArmyStrength: 0,
 		Gold:         10,
-		Peasants:     1,
+		Peasants:     5,
+		RevoltRisk:   2,
 		IsRepublic:   false,
 		MonarchID:    monarchID,
 		DiedOnce:     false,
@@ -83,6 +85,7 @@ func (c *Country) Clone() *Country {
 		ArmyStrength: c.ArmyStrength,
 		Gold:         c.Gold,
 		Peasants:     c.Peasants,
+		RevoltRisk:   c.RevoltRisk,
 		IsRepublic:   c.IsRepublic,
 		MonarchID:    c.MonarchID,
 		DiedOnce:     c.DiedOnce,

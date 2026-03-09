@@ -38,6 +38,7 @@ func SerializeCountry(c *engine.Country) *CountryJSON {
 		ArmyStrength: c.ArmyStrength,
 		Gold:         c.Gold,
 		Peasants:     c.Peasants,
+		RevoltRisk:   c.RevoltRisk,
 		IsRepublic:   c.IsRepublic,
 		MonarchID:    c.MonarchID,
 		DiedOnce:     c.DiedOnce,

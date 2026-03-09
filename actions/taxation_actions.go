@@ -10,7 +10,7 @@ import (
 type TaxPeasantsAction struct {
 	BaseAction
 	CountryID string
-	HighTax   bool // false = 5 gold safe, true = 10 gold with revolt risk
+	HighTax   bool // false = 1 gold/peasant safe, true = 2 gold/peasant with revolt risk
 }
 
 func NewTaxPeasantsAction(playerID, countryID string, highTax bool) *TaxPeasantsAction {
@@ -44,23 +44,36 @@ func (a *TaxPeasantsAction) Apply(state *engine.GameState, roller engine.DiceRol
 	country := newState.GetCountry(a.CountryID)
 	var evts []events.Event
 
-	goldPerPeasant := 5
+	goldPerPeasant := 1
 	if a.HighTax {
-		goldPerPeasant = 10
+		goldPerPeasant = 2
 	}
 
 	totalGold := goldPerPeasant * country.Peasants
-	country.AddGold(totalGold)
-	evts = append(evts, events.NewPeasantTaxEvent(a.CountryID, totalGold, a.HighTax))
 
-	// Check for revolt on high tax (2/6 chance)
 	if a.HighTax {
+		// Roll d6 against country's revolt risk (N/6 chance)
 		roll := roller.Roll(6)
-		if roll <= 2 {
+		if roll <= country.RevoltRisk {
+			// Revolt: no gold, take 2 HP damage, reset risk
 			damage := 2
 			country.TakeDamage(damage)
+			country.RevoltRisk = 2
+			evts = append(evts, events.NewPeasantTaxEvent(a.CountryID, 0, a.HighTax))
 			evts = append(evts, events.NewPeasantRevoltEvent(a.CountryID, damage))
+		} else {
+			// No revolt: collect gold, escalate risk
+			country.AddGold(totalGold)
+			if country.RevoltRisk < 5 {
+				country.RevoltRisk++
+			}
+			evts = append(evts, events.NewPeasantTaxEvent(a.CountryID, totalGold, a.HighTax))
 		}
+	} else {
+		// Low tax: always succeeds, reset revolt risk
+		country.AddGold(totalGold)
+		country.RevoltRisk = 2
+		evts = append(evts, events.NewPeasantTaxEvent(a.CountryID, totalGold, a.HighTax))
 	}
 
 	return newState, evts
